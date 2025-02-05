@@ -1,3 +1,4 @@
+from datetime import time, date
 from .models import db, Contact, Event, Project, News, Publications, Organisation, Magazine, Author
 
 def serialize_author(author : Author):
@@ -5,7 +6,7 @@ def serialize_author(author : Author):
     return f"{author.last_name} {get_initials(author)}"
 
 def get_initials(author : Author):
-    return f"{author.first_name[0]}.{author.middle_name[0] if author.middle_name else ''}"
+    return f"{author.first_name[0]}.{author.middle_name[0] + '.' if author.middle_name else ''}"
 
 def serialize_news(news : News):
     return {
@@ -23,8 +24,10 @@ def serialize_events(event : Event):
     return {
             'id': event.id,
             'title': event.title,
-            'date': event.date,
-            'time': event.time,
+            'date': event.date.isoformat() if isinstance(event.date, date) else event.date,
+            'time': event.time.strftime("%H:%M") if isinstance(event.time, time) else event.time,
+            # 'date': event.date,
+            # 'time': event.time,
             'location': event.location,
             'description': event.description
         }
