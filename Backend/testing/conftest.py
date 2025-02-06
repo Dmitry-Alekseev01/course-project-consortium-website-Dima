@@ -7,9 +7,8 @@ from pathlib import Path
 root_dir = Path(__file__).parent.parent
 sys.path.append(str(root_dir))
 
-from app.models import Author, News, Event, Project, Publications, Organisation, Magazine
-
-
+from app.models import Author, News, Event, Project, Publications, Organisation, Magazine, db
+from app import create_app
 
 @fixture
 def sample_author_with_middle_name():
@@ -90,3 +89,19 @@ def sample_organisation():
         image="kitchen.jpg",
         link="https://t.me/vyshkochka"
     )
+
+
+
+@fixture
+def app_testing():
+    #app.config['WTF_CSRF_ENABLED'] = False
+    app = create_app('app.config.TestConfig')
+    with app.app_context():
+        #db.create_all()
+        yield app
+        db.session.remove()
+        db.drop_all()
+
+@fixture
+def client(app_testing):
+    return app_testing.test_client()
