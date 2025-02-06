@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime, time, date
 db = SQLAlchemy()
 
 # Таблица для журналов
@@ -47,8 +47,10 @@ class Contact(db.Model):
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.String(50), nullable=False)
-    time = db.Column(db.DateTime, nullable=False)
+    # date = db.Column(db.String(50), nullable=False)
+    # time = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
 

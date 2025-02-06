@@ -14,9 +14,9 @@ mail = Mail()
 migrate = Migrate()
 admin = Admin(name='Admin Panel', template_mode='bootstrap3')
 
-def create_app():
+def create_app(config_path = 'app.config.Config'):
     app = Flask(__name__)
-    app.config.from_object('app.config.Config')
+    app.config.from_object(config_path)
     app.config['DEBUG'] = True
 
     # Инициализация расширений
