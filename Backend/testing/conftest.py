@@ -444,3 +444,13 @@ def route_magazine():
         db.session.rollback()
         raise Exception(f"Ошибка при добавлении журнала: {e}")
     return db.session.get(Magazine, magazine.id)
+
+@fixture
+def mock_contact_data():
+    """Моковые данные для создания контакта"""
+    return {
+        "name": "Test Contact",
+        "email": "leonidlivshits05@gmail.com",
+        "phone": "9876543210",
+        "message": "This is a test message"
+    }
