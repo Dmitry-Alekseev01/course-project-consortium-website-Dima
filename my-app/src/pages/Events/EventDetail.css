@@ -1,10 +1,10 @@
- .event-detail {
+.event-detail {
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 100vh; /* Занимает всю высоту страницы */
+    min-height: 100vh; /* Замена height на min-height для адаптивности */
     box-sizing: border-box;
+    position: relative; /* Добавлено для позиционирования футера */
 }
 
 .event-detail .container {
@@ -58,4 +58,4 @@
     .event-detail .details p {
         font-size: 16px;
     }
-}
+} 
