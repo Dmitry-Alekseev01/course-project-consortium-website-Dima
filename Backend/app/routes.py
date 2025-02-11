@@ -306,6 +306,7 @@
 
 
 from flask import Blueprint, request, jsonify, send_from_directory, Response
+from email_validator import validate_email, EmailNotValidError
 from sqlalchemy import select as sa_select  # Импортируем select из SQLAlchemy
 from werkzeug.utils import secure_filename
 import os
@@ -320,11 +321,94 @@ main = Blueprint('main', __name__)
 UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-# Маршрут для создания контакта
+# # Маршрут для создания контакта
+# @main.route('/api/contact', methods=['POST'])
+# def create_contact():
+#     print("create_contact	")
+#     data = request.get_json()
+#     new_contact = Contact(
+#         name=data['name'],
+#         email=data['email'],
+#         phone=data['phone'],
+#         company=data.get('company'),
+#         message=data['message']
+#     )
+#     db.session.add(new_contact)
+#     db.session.commit()
+#     msg = Message(
+#         subject=f'Новое сообщение от {data["name"]}',
+#         sender=data['email'],
+#         recipients=['maxweinsberg25@gmail.com'],
+#         body=f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
+#     )
+#     try:
+#         mail.send(msg)
+#         return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
+#     except Exception as e:
+#         logging.error(f"Ошибка при отправке email: {e}")
+#         return jsonify({'error': 'Не удалось отправить сообщение'}), 500
+
+# @main.route('/api/contact', methods=['POST'])
+# def create_contact():
+#     print("create_contact --------------------------------------")
+#     data = request.get_json()
+
+#     # Проверка валидности email
+#     try:
+#         email_info = validate_email(data['email'], check_deliverability=False)
+#         data['email'] = email_info.normalized
+#     except EmailNotValidError as e:
+#         return jsonify({'error': str(e)}), 400
+
+#     new_contact = Contact(
+#         name=data['name'],
+#         email=data['email'],
+#         phone=data['phone'],
+#         company=data.get('company'),
+#         message=data['message']
+#     )
+#     db.session.add(new_contact)
+#     db.session.commit()
+
+#     msg = Message(
+#         subject=f'Новое сообщение от {data["name"]}',
+#         sender=data['email'],
+#         recipients=['maxweinsberg25@gmail.com'],
+#         body=f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
+#     )
+#     try:
+#         mail.send(msg)
+#         return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
+#     except Exception as e:
+#         logging.error(f"Ошибка при отправке email: {e}")
+#         return jsonify({'error': 'Не удалось отправить сообщение'}), 500
+
+
+from flask_mail import Message
+
+def send_email(subject, sender, recipients, body):
+    try:
+        msg = Message(subject, sender=sender, recipients=recipients)
+        msg.body = body
+        mail.send(msg)
+        return True
+    except Exception as e:
+        logging.error(f"Ошибка при отправке email: {e}")
+        return False
+
+
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
-    print("create_contact	")
+    print("create_contact --------------------------------------")
     data = request.get_json()
+
+    # Проверка валидности email
+    try:
+        email_info = validate_email(data['email'], check_deliverability=False)
+        data['email'] = email_info.normalized
+    except EmailNotValidError as e:
+        return jsonify({'error': str(e)}), 400
+
     new_contact = Contact(
         name=data['name'],
         email=data['email'],
@@ -334,17 +418,13 @@ def create_contact():
     )
     db.session.add(new_contact)
     db.session.commit()
-    msg = Message(
-        subject=f'Новое сообщение от {data["name"]}',
-        sender=data['email'],
-        recipients=['maxweinsberg25@gmail.com'],
-        body=f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
-    )
-    try:
-        mail.send(msg)
+
+    # Отправка email
+    subject = f'Новое сообщение от {data["name"]}'
+    body = f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
+    if send_email(subject, data['email'], ['maxweinsberg25@gmail.com'], body):
         return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
-    except Exception as e:
-        logging.error(f"Ошибка при отправке email: {e}")
+    else:
         return jsonify({'error': 'Не удалось отправить сообщение'}), 500
 
 

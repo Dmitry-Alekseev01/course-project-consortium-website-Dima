@@ -1,4 +1,5 @@
 from datetime import datetime, date, time
+from app import mail
 from app.models import (
     Organisation,
     Contact,
@@ -49,6 +50,39 @@ class TestOrganisationRoutes:
 #         assert response.status_code == 201
 #         data = response.get_json()
 #         assert data['message'] == 'Сообщение отправлено успешно!'
+
+class TestContactRoutes:
+    def test_create_contact(self, client, app_testing, mock_contact_data):
+        with app_testing.app_context():
+            with mail.record_messages() as outbox:
+                # Выполняем запрос с моковыми данными
+                response = client.post('/api/contact', json=mock_contact_data)
+                assert response.status_code == 201
+                data = response.get_json()
+                assert data['message'] == 'Сообщение отправлено успешно!'
+
+                # Проверяем, что сообщение было отправлено
+                assert len(outbox) == 1
+                sent_message = outbox[0]
+                assert sent_message.subject == f"Новое сообщение от {mock_contact_data['name']}"
+                assert sent_message.sender == mock_contact_data['email']
+                assert sent_message.recipients == ['maxweinsberg25@gmail.com']
+                assert f"Имя: {mock_contact_data['name']}" in sent_message.body
+                assert f"Email: {mock_contact_data['email']}" in sent_message.body
+                assert f"Телефон: {mock_contact_data['phone']}" in sent_message.body
+                assert f"Сообщение: {mock_contact_data['message']}" in sent_message.body
+
+    def test_create_contact_without_email(self, client, app_testing, mock_contact_data):
+        with app_testing.app_context():
+            with mail.record_messages() as outbox:
+                # Удаляем обязательное поле email
+                invalid_data = mock_contact_data.copy()
+                invalid_data["email"] = "invalid_email"
+
+                # Выполняем запрос
+                response = client.post('/api/contact', json=invalid_data)
+                assert response.status_code == 400  # Ожидаем ошибку из-за невалидного email
+                assert len(outbox) == 0  # Проверяем, что сообщение не было отправлено
 
 
 class TestEventRoutes:
