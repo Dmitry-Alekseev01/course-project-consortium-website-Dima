@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-// import './ProjectDetails.css';
-// import './EventDetail.css';
+import '../Events/EventDetail.css';
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 
@@ -44,7 +43,7 @@ const ProjectDetails = () => {
   }
 
   return (
-    <section className="project-details">
+    <section className="event-detail">
       <Navbar />
       <div className="container">
         <h2>{project.title}</h2>

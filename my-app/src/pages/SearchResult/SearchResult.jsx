@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import "./SearchResult.css"
+import Navbar from "../../components/Navbar/Navbar";
+import Footer from "../../components/Footer/Footer";
 import { useLocation } from "react-router-dom";
 
 const SearchResults = () => {
@@ -30,6 +33,7 @@ const SearchResults = () => {
 
   return (
     <div>
+      <Navbar/>
       <h2>Результаты поиска по запросу: "{query}"</h2>
       {error && <p className="error-message">{error}</p>}
       {searchResults ? (
@@ -50,6 +54,7 @@ const SearchResults = () => {
       ) : (
         <p>Загрузка...</p>
       )}
+      <Footer/>
     </div>
   );
 };

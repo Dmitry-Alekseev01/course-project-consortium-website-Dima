@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
 
 const Publications = () => {
   const [publications, setPublications] = useState([]);
@@ -22,8 +23,11 @@ const Publications = () => {
             <h2>{publication.title}</h2>
             <p><strong>Авторы:</strong> {publication.authors.join(', ')}</p>
             <p><strong>Дата публикации:</strong> {publication.publication_date}</p>
-            <p><strong>Журнал:</strong> {publication.magazine || "Не указан"}</p>
+            <p><strong>Журнал:</strong> {publication.magazine || "Не издавалась"}</p>
             <p><strong>Описание:</strong> {publication.annotation}</p>
+            <Link to={`/publications/${publication.id}`} state={publication} className="publication-link">
+              Подробнее
+            </Link>
           </div>
         ))}
       </div>

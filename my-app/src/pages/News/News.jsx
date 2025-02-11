@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-// import "./News.css";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
+
 
 const News = () => {
   const [news, setNews] = useState([]);
@@ -67,12 +68,15 @@ const News = () => {
             <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
             <p><strong>Дата публикации:</strong> {news.publication_date}</p>
             <p><strong>Описание:</strong> {news.description}</p>
-            <p><strong>Журнал:</strong> {news.magazine || "Не указан"}</p>
+            <p><strong>Журнал:</strong> {news.magazine || "Не издавалась"}</p>
             <p><strong>Текст:</strong> {news.content}</p>
             <p>
               <strong>Материалы:</strong>{" "}
               {news.materials ? renderFile(`http://127.0.0.1:5000${news.materials}`) : "Файл отсутствует"}
             </p>
+            <Link to={`/news/${news.id}`} state={news} className="news-link">
+              Подробнее
+            </Link>
           </div>
         ))}
       </div>

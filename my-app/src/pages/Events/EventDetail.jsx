@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ContactForm from '../../components/ContactForm/ContactForm';
 import './EventDetail.css';
+import '../../components/Footer/Footer.css'
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 

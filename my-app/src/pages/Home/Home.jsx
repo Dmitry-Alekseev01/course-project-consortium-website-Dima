@@ -1,5 +1,5 @@
 import React from "react";
-
+import MapSection from "../../components/MapSection/MapSection";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import ContactForm from "../../components/ContactForm/ContactForm";
@@ -12,6 +12,7 @@ const Home = () => {
       <div className="page"> 
       <h1>Добро пожаловать на сайт</h1>
       </div>
+      <MapSection/>
       <Contacts/>
       <ContactForm/>
       <Footer />
