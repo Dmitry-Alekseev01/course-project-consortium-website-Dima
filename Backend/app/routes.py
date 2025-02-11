@@ -407,7 +407,8 @@ def create_contact():
         email_info = validate_email(data['email'], check_deliverability=False)
         data['email'] = email_info.normalized
     except EmailNotValidError as e:
-        return jsonify({'error': str(e)}), 400
+        logging.error(f"Email validation error: {e}")
+        return jsonify({'error': 'Invalid email address provided.'}), 400
 
     new_contact = Contact(
         name=data['name'],
