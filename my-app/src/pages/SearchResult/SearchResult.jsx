@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./SearchResult.css"
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import SortButton from "../../components/SortButton/SortButton";
 import { useLocation } from "react-router-dom";
 
 const SearchResults = () => {
@@ -54,6 +55,7 @@ const SearchResults = () => {
       ) : (
         <p>Загрузка...</p>
       )}
+      <SortButton/>
       <Footer/>
     </div>
   );
