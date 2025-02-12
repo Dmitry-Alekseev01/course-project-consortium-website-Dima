@@ -1,4 +1,5 @@
 from datetime import datetime, date, time
+from unittest.mock import MagicMock, patch
 from app import mail
 from app.models import (
     Organisation,
@@ -199,3 +200,32 @@ class TestMagazineRoutes:
         data = response.get_json()
         assert len(data) == 1
         assert data[0]['name'] == 'Magazine1'
+
+
+class TestSearchRoutes:
+    def test_search_all_types(self, client, mock_db_session, mock_news, mock_publication, mock_project, mock_event, mock_organisation, mock_author, mock_magazine):
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [mock_news],
+            [mock_publication],
+            [mock_project],
+            [mock_event],
+            [mock_organisation],
+            [mock_author],
+            [mock_magazine]
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        # Выполняем запрос на поиск
+        response = client.get('/api/search?q=Test')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        # Проверяем результаты поиска
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['projects']) == 1
+        assert len(data['events']) == 1
+        assert len(data['organisations']) == 1
+        assert len(data['authors']) == 1
+        assert len(data['magazines']) == 1

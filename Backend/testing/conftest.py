@@ -189,13 +189,14 @@
 #     db.session.commit()
 #     return magazine
 
-
-
+from flask_mail import Mail
+from unittest.mock import MagicMock, patch
 from pytest import fixture
 from datetime import datetime, date, time
 import sys
 from pathlib import Path
 from sqlalchemy.exc import SQLAlchemyError
+from flask_admin import Admin
 
 root_dir = Path(__file__).parent.parent
 sys.path.append(str(root_dir))
@@ -445,6 +446,7 @@ def route_magazine():
         raise Exception(f"Ошибка при добавлении журнала: {e}")
     return db.session.get(Magazine, magazine.id)
 
+
 @fixture
 def mock_contact_data():
     """Моковые данные для создания контакта"""
@@ -454,3 +456,109 @@ def mock_contact_data():
         "phone": "9876543210",
         "message": "This is a test message"
     }
+
+
+
+@fixture
+def mock_mail(app_testing):
+    """Мок для отправки email."""
+    with app_testing.app_context():
+        mail = Mail(app_testing)
+        with patch.object(mail, 'send', return_value=True) as mock_send:
+            yield mock_send
+
+
+@fixture
+def mock_db_session():
+    """Мок для сессии базы данных."""
+    with patch('app.models.db.session') as mock_session:
+        mock_scalars = MagicMock()
+        mock_scalars.all.return_value = []
+        mock_session.scalars.return_value = mock_scalars
+        yield mock_session
+
+@fixture
+def mock_contact():
+    """Мок для модели Contact."""
+    contact = MagicMock(spec=Contact)
+    contact.id = 1
+    contact.name = "Test Contact"
+    contact.email = "test@example.com"
+    contact.phone = "1234567890"
+    contact.message = "Test message"
+    return contact
+
+@fixture
+def mock_news():
+    """Мок для модели News."""
+    news = MagicMock(spec=News)
+    news.id = 1
+    news.title = "Test News"
+    news.description = "Test Description"
+    news.content = "Test Content"
+    return news
+
+@fixture
+def mock_event():
+    """Мок для модели Event."""
+    event = MagicMock(spec=Event)
+    event.id = 1
+    event.title = "Test Event"
+    event.description = "Test Description"
+    event.location = "Test Location"
+    return event
+
+@fixture
+def mock_project():
+    """Мок для модели Project."""
+    project = MagicMock(spec=Project)
+    project.id = 1
+    project.title = "Test Project"
+    project.description = "Test Description"
+    project.content = "Test Content"
+    return project
+
+@fixture
+def mock_publication():
+    """Мок для модели Publications."""
+    publication = MagicMock(spec=Publications)
+    publication.id = 1
+    publication.title = "Test Publication"
+    publication.annotation = "Test Annotation"
+    return publication
+
+@fixture
+def mock_author():
+    """Мок для модели Author."""
+    author = MagicMock(spec=Author)
+    author.id = 1
+    author.first_name = "Test"
+    author.last_name = "Author"
+    author.middle_name = "Middle"
+    return author
+
+@fixture
+def mock_magazine():
+    """Мок для модели Magazine."""
+    magazine = MagicMock(spec=Magazine)
+    magazine.id = 1
+    magazine.name = "Test Magazine"
+    return magazine
+
+@fixture
+def mock_organisation():
+    """Мок для модели Organisation."""
+    organisation = MagicMock(spec=Organisation)
+    organisation.id = 1
+    organisation.link = "https://test.com"
+    return organisation
+
+@fixture
+def mock_admin():
+    return MagicMock(spec=Admin)
+
+@fixture
+def mock_db(mock_db_session):
+    db_mock = MagicMock()
+    db_mock.session = mock_db_session
+    return db_mock
