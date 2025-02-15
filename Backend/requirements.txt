@@ -14,3 +14,4 @@ dnspython==2.6.1
 email_validator==2.2.0
 idna==3.10
 secure-smtplib==0.1.1
+Flask-BasicAuth==0.2.0

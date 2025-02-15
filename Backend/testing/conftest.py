@@ -324,35 +324,37 @@ def client(app_testing):
 def route_organisation():
     org = Organisation(image="image1.png", link="https://org1.com")
     db.session.add(org)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении организации: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении организации: {e}")
     return db.session.get(Organisation, org.id)
 
 
-@fixture
-def route_contact():
-    data = {
-        "name": "Leo Livshitz",
-        "email": "Leolivshitz@gmail.com",
-        "phone": "1234567890",
-        "message": "Hello, World!",
-    }
-    # Проверяем наличие обязательных полей
-    required_fields = ["name", "email", "phone", "message"]
-    if not all(field in data for field in required_fields):
-        raise ValueError("Отсутствуют обязательные поля для создания контакта")
+# @fixture
+# def route_contact():
+#     data = {
+#         "name": "Leo Livshitz",
+#         "email": "Leolivshitz@gmail.com",
+#         "phone": "1234567890",
+#         "message": "Hello, World!",
+#     }
+#     # Проверяем наличие обязательных полей
+#     required_fields = ["name", "email", "phone", "message"]
+#     if not all(field in data for field in required_fields):
+#         raise ValueError("Отсутствуют обязательные поля для создания контакта")
 
-    contact = Contact(**data)
-    db.session.add(contact)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении контакта: {e}")
-    return db.session.get(Contact, contact.id)
+#     contact = Contact(**data)
+#     db.session.add(contact)
+#     db.session.commit()
+#     # try:
+#     #     db.session.commit()
+#     # except SQLAlchemyError as e:
+#     #     db.session.rollback()
+#     #     raise Exception(f"Ошибка при добавлении контакта: {e}")
+#     return db.session.get(Contact, contact.id)
 
 
 @fixture
@@ -365,11 +367,12 @@ def route_event():
         location="Location1",
     )
     db.session.add(event)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении события: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении события: {e}")
     return db.session.get(Event, event.id)
 
 
@@ -382,11 +385,12 @@ def route_news():
         content="Content1",
     )
     db.session.add(news)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении новости: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении новости: {e}")
     return db.session.get(News, news.id)
 
 
@@ -399,11 +403,12 @@ def route_project():
         content="Content1",
     )
     db.session.add(project)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении проекта: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении проекта: {e}")
     return db.session.get(Project, project.id)
 
 
@@ -415,11 +420,12 @@ def route_publication():
         publication_date=datetime(2023, 10, 1),
     )
     db.session.add(publication)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении публикации: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении публикации: {e}")
     return db.session.get(Publications, publication.id)
 
 
@@ -427,11 +433,12 @@ def route_publication():
 def route_author():
     author = Author(first_name="Leo", last_name="Livshitz")
     db.session.add(author)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении автора: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении автора: {e}")
     return db.session.get(Author, author.id)
 
 
@@ -439,11 +446,12 @@ def route_author():
 def route_magazine():
     magazine = Magazine(name="Magazine1")
     db.session.add(magazine)
-    try:
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise Exception(f"Ошибка при добавлении журнала: {e}")
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении журнала: {e}")
     return db.session.get(Magazine, magazine.id)
 
 
@@ -459,13 +467,13 @@ def mock_contact_data():
 
 
 
-@fixture
-def mock_mail(app_testing):
-    """Мок для отправки email."""
-    with app_testing.app_context():
-        mail = Mail(app_testing)
-        with patch.object(mail, 'send', return_value=True) as mock_send:
-            yield mock_send
+# @fixture
+# def mock_mail(app_testing):
+#     """Мок для отправки email."""
+#     with app_testing.app_context():
+#         mail = Mail(app_testing)
+#         with patch.object(mail, 'send', return_value=True) as mock_send:
+#             yield mock_send
 
 
 @fixture
@@ -477,16 +485,16 @@ def mock_db_session():
         mock_session.scalars.return_value = mock_scalars
         yield mock_session
 
-@fixture
-def mock_contact():
-    """Мок для модели Contact."""
-    contact = MagicMock(spec=Contact)
-    contact.id = 1
-    contact.name = "Test Contact"
-    contact.email = "test@example.com"
-    contact.phone = "1234567890"
-    contact.message = "Test message"
-    return contact
+# @fixture
+# def mock_contact():
+#     """Мок для модели Contact."""
+#     contact = MagicMock(spec=Contact)
+#     contact.id = 1
+#     contact.name = "Test Contact"
+#     contact.email = "test@example.com"
+#     contact.phone = "1234567890"
+#     contact.message = "Test message"
+#     return contact
 
 @fixture
 def mock_news():
@@ -519,7 +527,7 @@ def mock_project():
     return project
 
 @fixture
-def mock_publication():
+def mock_publications():
     """Мок для модели Publications."""
     publication = MagicMock(spec=Publications)
     publication.id = 1
@@ -553,12 +561,57 @@ def mock_organisation():
     organisation.link = "https://test.com"
     return organisation
 
-@fixture
-def mock_admin():
-    return MagicMock(spec=Admin)
+# @fixture
+# def mock_admin():
+#     return MagicMock(spec=Admin)
+
+# @fixture
+# def mock_db(mock_db_session):
+#     db_mock = MagicMock()
+#     db_mock.session = mock_db_session
+#     return db_mock
+
 
 @fixture
-def mock_db(mock_db_session):
-    db_mock = MagicMock()
-    db_mock.session = mock_db_session
-    return db_mock
+def uploaded_organisation(sample_organisation):
+    org = sample_organisation
+    db.session.add(org)
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except SQLAlchemyError as e:
+    #     db.session.rollback()
+    #     raise Exception(f"Ошибка при добавлении организации: {e}")
+    return db.session.get(Organisation, org.id)
+
+class MockMail:
+    # def send(message, *args, **kwargs):
+    #     raise Exception
+    def init_app(app, *args, **kwargs):
+        pass
+
+@fixture
+def app_testing_mail():
+    app = create_app("app.config.TestConfig", MockMail())
+    with app.app_context():
+        try:
+            db.create_all()
+            yield app
+        finally:
+            db.session.remove()
+            db.drop_all()
+
+
+@fixture
+def client_mail(app_testing_mail):
+    return app_testing_mail.test_client()
+
+@fixture
+def mock_news_for_search():
+    news = News(id=1, title="Test News", publication_date="2023-10-01")
+    return news
+
+
+@fixture
+def mock_filters_for_search():
+    return [News.title.ilike("%Test%")]

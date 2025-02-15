@@ -8,7 +8,7 @@ from flask_mail import Message
 from . import mail
 from . import serializers
 import logging
-
+from enum import Enum, auto
 main = Blueprint('main', __name__)
 
 UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
@@ -60,7 +60,7 @@ def create_contact():
     if send_email(subject, data['email'], ['maxweinsberg25@gmail.com'], body):
         return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
     else:
-        return jsonify({'error': 'Не удалось отправить сообщение'}), 500
+        return jsonify({'error': 'Не удалось отправить сообщение'}), 200
 
 
 # Маршрут для получения всех событий
@@ -145,6 +145,7 @@ def get_publication_by_id(publication_id):
 
 # Маршрут для получения всех организаций
 @main.route('/api/organisations', methods=['GET'])
+#@basic_auth.required
 def get_organisations():
     all_organisations = db.session.scalars(sa_select(Organisation)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
     organisations_list = []
@@ -180,47 +181,165 @@ def get_authors():
                     for author in authors]
     return jsonify(authors_list), 200
 
+def get_and_sort_results(model, filters, sort_key=None, reverse=False):
+    results = db.session.scalars(sa_select(model).filter(*filters)).all()
+    if sort_key:
+        results = sorted(results, key=lambda x: getattr(x, sort_key), reverse=reverse)
+    return results
 
+class SortType(Enum):
+    ALPHABETICAL = auto()  # Сортировка по алфавиту
+    REVERSE_ALPHABETICAL = auto()  # Сортировка в обратном алфавитном порядке
+    DATE_ASC = auto()  # Сортировка по дате (по возрастанию)
+    DATE_DESC = auto()  # Сортировка по дате (по убыванию)
+
+def get_sort_params(sort_type):
+    sort_mapping = {
+        SortType.ALPHABETICAL: {"sort_key": "title", "reverse": False},
+        SortType.REVERSE_ALPHABETICAL: {"sort_key": "title", "reverse": True},
+        SortType.DATE_ASC: {"sort_key": "date", "reverse": False},
+        SortType.DATE_DESC: {"sort_key": "date", "reverse": True},
+    }
+    return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
+
+
+# Это старый рабочий метод НЕ УДАЛЯТЬ
 # Маршрут для поиска
+# @main.route('/api/search', methods=['GET'])
+# def search():
+#     query = request.args.get('q', '').strip()
+#     print(f" Получен запрос на поиск: '{query}'")
+#     if not query:
+#         return jsonify({"error": "Пустой запрос"}), 400
+#     search_pattern = f"%{query}%"  # Поиск подстроки
+
+#     news_results = db.session.scalars(
+#         sa_select(News).filter(
+#             (News.title.ilike(search_pattern)) | 
+#             (News.description.ilike(search_pattern)) | 
+#             (News.content.ilike(search_pattern))
+#         )
+#     ).all()
+
+#     publications_results = db.session.scalars(
+#         sa_select(Publications).filter(
+#             (Publications.title.ilike(search_pattern)) | 
+#             (Publications.annotation.ilike(search_pattern))
+#         )
+#     ).all()
+
+#     projects_results = db.session.scalars(
+#         sa_select(Project).filter(
+#             (Project.title.ilike(search_pattern)) | 
+#             (Project.description.ilike(search_pattern)) | 
+#             (Project.content.ilike(search_pattern))
+#         )
+#     ).all()
+
+#     events_results = db.session.scalars(
+#         sa_select(Event).filter(
+#             (Event.title.ilike(search_pattern)) | 
+#             (Event.description.ilike(search_pattern)) | 
+#             (Event.location.ilike(search_pattern))
+#         )
+#     ).all()
+
+#     organisations_results = db.session.scalars(
+#         sa_select(Organisation).filter(
+#             Organisation.link.ilike(search_pattern)
+#         )
+#     ).all()
+
+#     authors_results = db.session.scalars(
+#         sa_select(Author).filter(
+#             (Author.first_name.ilike(search_pattern)) | 
+#             (Author.last_name.ilike(search_pattern)) | 
+#             (Author.middle_name.ilike(search_pattern))
+#         )
+#     ).all()
+
+#     magazines_results = db.session.scalars(
+#         sa_select(Magazine).filter(
+#             Magazine.name.ilike(search_pattern)
+#         )
+#     ).all()
+
+#     results = {
+#         "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
+#         "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
+#         "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
+#         "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
+#         "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
+#         "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
+#         "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
+#     }
+#     return jsonify(results)
+
 @main.route('/api/search', methods=['GET'])
 def search():
     query = request.args.get('q', '').strip()
-    print(f" Получен запрос на поиск: '{query}'")
+    sort_type_str = request.args.get('sort', '').strip()
+
     if not query:
         return jsonify({"error": "Пустой запрос"}), 400
-    search_pattern = f"%{query}%"  # Поиск подстроки
 
-    # ЗАМЕНА: query.filter() -> session.scalars(select(...).filter(...))
-    news_results = db.session.scalars(
-        sa_select(News).filter(
-            (News.title.ilike(search_pattern)) | 
-            (News.description.ilike(search_pattern)) | 
+    # Преобразуем строку в значение enum
+    try:
+        sort_type = SortType[sort_type_str.upper()]
+    except KeyError:
+        sort_type = None
+
+    # Получаем параметры сортировки
+    sort_params = get_sort_params(sort_type)
+    sort_key = sort_params["sort_key"]
+    reverse = sort_params["reverse"]
+
+    search_pattern = f"%{query}%"
+
+
+    # Получение и сортировка данных для каждой категории
+    news_results = get_and_sort_results(
+        News,
+        [
+            (News.title.ilike(search_pattern)) |
+            (News.description.ilike(search_pattern)) |
             (News.content.ilike(search_pattern))
-        )
-    ).all()
+        ],
+        sort_key=sort_key,
+        reverse=reverse
+    )
 
-    publications_results = db.session.scalars(
-        sa_select(Publications).filter(
-            (Publications.title.ilike(search_pattern)) | 
+    publications_results = get_and_sort_results(
+        Publications,
+        [
+            (Publications.title.ilike(search_pattern)) |
             (Publications.annotation.ilike(search_pattern))
-        )
-    ).all()
+        ],
+        sort_key=sort_key,
+        reverse=reverse
+    )
 
-    projects_results = db.session.scalars(
-        sa_select(Project).filter(
-            (Project.title.ilike(search_pattern)) | 
-            (Project.description.ilike(search_pattern)) | 
-            (Project.content.ilike(search_pattern))
-        )
-    ).all()
+    events_results = get_and_sort_results(
+        Event,
+        [
+            (Event.description.ilike(search_pattern)) |
+            (Event.location.ilike(search_pattern)) |
+            (Event.title.ilike(search_pattern))
+        ],
+        sort_key=sort_key,
+        reverse=reverse
+    )
 
-    events_results = db.session.scalars(
-        sa_select(Event).filter(
-            (Event.title.ilike(search_pattern)) | 
-            (Event.description.ilike(search_pattern)) | 
-            (Event.location.ilike(search_pattern))
-        )
-    ).all()
+    projects_results = get_and_sort_results(
+        Project,
+        [
+            (Project.description.ilike(search_pattern)) |
+            (Project.content.ilike(search_pattern)) |
+            (Project.title.ilike(search_pattern))
+        ],
+        sort_key=sort_key,
+        reverse=reverse
+    )
 
     organisations_results = db.session.scalars(
         sa_select(Organisation).filter(
@@ -242,13 +361,14 @@ def search():
         )
     ).all()
 
+
     results = {
-        "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
-        "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
-        "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
-        "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
-        "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
-        "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
-        "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
+         "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
+         "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
+         "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
+         "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
+         "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
+         "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
+         "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
     }
     return jsonify(results)
