@@ -1,5 +1,6 @@
 from datetime import datetime, date, time
 from unittest.mock import MagicMock, patch
+from app.routes import get_and_sort_results
 from app import mail
 from app.models import (
     Organisation,
@@ -85,6 +86,12 @@ class TestContactRoutes:
                 assert response.status_code == 400  # Ожидаем ошибку из-за невалидного email
                 assert len(outbox) == 0  # Проверяем, что сообщение не было отправлено
 
+    def test_create_incorrect(self, client_mail, mock_contact_data):
+        #with app_testing_mail.app_context():
+        
+        response = client_mail.post('/api/contact', json=mock_contact_data)
+        assert response.status_code == 200
+                
 
 class TestEventRoutes:
     def test_get_events(self, client, route_event):
@@ -203,11 +210,52 @@ class TestMagazineRoutes:
 
 
 class TestSearchRoutes:
-    def test_search_all_types(self, client, mock_db_session, mock_news, mock_publication, mock_project, mock_event, mock_organisation, mock_author, mock_magazine):
+    def test_get_and_sort_results_without_sort(self, mock_news_for_search, mock_filters_for_search):
+        with patch('app.models.db.session.scalars') as mock_scalars:
+            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+
+            # Вызываем функцию без сортировки
+            results = get_and_sort_results(News, mock_filters_for_search)
+
+            assert len(results) == 1
+            assert results[0].title == "Test News"
+
+    def test_get_and_sort_results_with_sort(self, mock_news_for_search, mock_filters_for_search):
+        with patch('app.models.db.session.scalars') as mock_scalars:
+            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+
+            # Вызываем функцию с сортировкой по title
+            results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=False)
+
+            assert len(results) == 1
+            assert results[0].title == "Test News"
+
+    def test_get_and_sort_results_with_reverse_sort(self, mock_news_for_search, mock_filters_for_search):
+        with patch('app.models.db.session.scalars') as mock_scalars:
+            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+
+            # Вызываем функцию с сортировкой по title в обратном порядке
+            results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=True)
+
+            assert len(results) == 1
+            assert results[0].title == "Test News"
+
+    def test_get_and_sort_results_with_date_sort(self, mock_news_for_search, mock_filters_for_search):
+        with patch('app.models.db.session.scalars') as mock_scalars:
+            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+
+            # Вызываем функцию с сортировкой по дате
+            results = get_and_sort_results(News, mock_filters_for_search, sort_key='publication_date', reverse=False)
+
+            # Проверяем, что результаты возвращены корректно
+            assert len(results) == 1
+            assert results[0].publication_date == "2023-10-01"
+
+    def test_search_all_types(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event, mock_organisation, mock_author, mock_magazine):
         mock_scalars = MagicMock()
         mock_scalars.all.side_effect = [
             [mock_news],
-            [mock_publication],
+            [mock_publications],
             [mock_project],
             [mock_event],
             [mock_organisation],
@@ -229,3 +277,20 @@ class TestSearchRoutes:
         assert len(data['organisations']) == 1
         assert len(data['authors']) == 1
         assert len(data['magazines']) == 1
+
+    def test_search_empty_query(self, client):
+        response = client.get('/api/search?q=')
+        assert response.status_code == 400
+
+    def test_search_empty_q(self, client):
+        response = client.get('/api/search?')
+        assert response.status_code == 400
+
+class TestUploadsFile:
+    def test_uploaded_wrong_file(self, client):
+        response = client.get("/uploads/goal")
+        assert response.status_code == 404
+    def test_uploaded_correct_file(self, client, uploaded_organisation):
+        response = client.get(f"/uploads/{uploaded_organisation.image}")
+        assert response.status_code == 200
+        

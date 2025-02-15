@@ -50,5 +50,9 @@ class Config:
         'SECRET_KEY',
     )
 
+    BASIC_AUTH_USERNAME = 'john'
+    BASIC_AUTH_PASSWORD = 'matrix'
+    #BASIC_AUTH_FORCE = True
+
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI= 'sqlite:///:memory:'
