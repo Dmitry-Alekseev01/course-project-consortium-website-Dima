@@ -49,8 +49,8 @@ const SortButton = ({ onSort }) => {
         <div className="dropdown-content">
           <a href="#" onClick={() => handleSort('alphabetical')}>По алфавиту (А - Я)</a>
           <a href="#" onClick={() => handleSort('reverse_alphabetical')}>По алфавиту (Я - А)</a>
-          <a href="#" onClick={() => handleSort('date_asc')}>По дате (нов - стар)</a>
-          <a href="#" onClick={() => handleSort('date_desc')}>По дате (стар - нов)</a>
+          <a href="#" onClick={() => handleSort('date_asc')}>По дате (стар - нов)</a>
+          <a href="#" onClick={() => handleSort('date_desc')}>По дате (нов - стар)</a>
         </div>
       )}
     </div>
