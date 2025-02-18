@@ -168,22 +168,25 @@ def seed_all(app):
         events_data = [
             {
                 "title": "Конференция",
-                "date": parse_date("15-01-2025"),  # Используем числовой формат
-                "time": parse_time("15:00"),
+                # "date": parse_date("15-01-2025"),  # Используем числовой формат
+                # "time": parse_time("15:00"),
+                "publication_date": datetime.strptime("21/11/06 16:30", "%d/%m/%y %H:%M"),
                 "location": "Москва, Россия",
                 "description": "Присоединяйтесь к нашей ежегодной конференции по кардиогенетике!"
             },
             {
                 "title": "Семинар",
-                "date": parse_date("22-02-2025"),  # Используем числовой формат
-                "time": parse_time("15:00"),
+                # "date": parse_date("22-02-2025"),  # Используем числовой формат
+                # "time": parse_time("15:00"),
+                "publication_date": datetime.strptime("21/11/06 16:30", "%d/%m/%y %H:%M"),
                 "location": "Санкт-Петербург, Россия",
                 "description": "Узнайте о последних методах в кардиогенетике на нашем семинаре."
             },
             {
                 "title": "Вебинар",
-                "date": parse_date("10-03-2025"),  # Используем числовой формат
-                "time": parse_time("15:00"),
+                # "date": parse_date("10-03-2025"),  # Используем числовой формат
+                # "time": parse_time("15:00"),
+                "publication_date": datetime.strptime("21/11/06 16:30", "%d/%m/%y %H:%M"),
                 "location": "Онлайн",
                 "description": "Не пропустите наш вебинар о генетических тестах!"
             }
