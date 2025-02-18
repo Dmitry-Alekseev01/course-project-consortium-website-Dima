@@ -49,8 +49,9 @@ const EventDetails = () => {
       <Navbar />
       <div className="container">
         <h2>{event.title}</h2>
-        <p><strong>Дата:</strong> {event.date}</p>
-        <p><strong>Время:</strong> {event.time}</p>
+        {/* <p><strong>Дата:</strong> {event.date}</p>
+        <p><strong>Время:</strong> {event.time}</p> */}
+        <p><strong>Дата проведения:</strong> {event.publication_date}</p>
         <p><strong>Место проведения:</strong> {event.location}</p>
         <p>{event.description}</p>
         <ContactForm />
