@@ -16,7 +16,7 @@ const EventCard = ({ event }) => {
       </div>
       <div className="event-content">
         <h3>{event.title}</h3>
-        <p>{event.date}</p>
+        <p>{event.publication_date}</p>
         <p>{event.description.substring(0, 100)}...</p>
       </div>
     </div>

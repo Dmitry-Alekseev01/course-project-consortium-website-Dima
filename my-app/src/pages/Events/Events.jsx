@@ -23,8 +23,9 @@ const Events = () => {
           <div key={event.id} className="event">
             <h2>{event.title}</h2>
             <p>{event.description}</p>
-            <p><strong>Дата:</strong> {event.date}</p>
-            <p><strong>Время:</strong> {event.time}</p>
+            {/* <p><strong>Дата:</strong> {event.date}</p>
+            <p><strong>Время:</strong> {event.time}</p> */}
+            <p><strong>Дата проведения:</strong> {event.publication_date}</p>
             <p><strong>Место:</strong> {event.location}</p>
             <Link to={`/events/${event.id}`} state={event} className="event-link">
               Подробнее
