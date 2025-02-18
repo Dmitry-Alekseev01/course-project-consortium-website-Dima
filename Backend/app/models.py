@@ -49,8 +49,9 @@ class Event(db.Model):
     title = db.Column(db.String(100), nullable=False)
     # date = db.Column(db.String(50), nullable=False)
     # time = db.Column(db.DateTime, nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=False)
+    publication_date = db.Column(db.DateTime, nullable=False)
+    #date = db.Column(db.Date, nullable=False)
+    #time = db.Column(db.Time, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
 

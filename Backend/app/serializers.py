@@ -24,8 +24,9 @@ def serialize_events(event : Event):
     return {
             'id': event.id,
             'title': event.title,
-            'date': event.date.isoformat() if isinstance(event.date, date) else event.date,
-            'time': event.time.strftime("%H:%M") if isinstance(event.time, time) else event.time,
+            # 'date': event.date.isoformat() if isinstance(event.date, date) else event.date,
+            # 'time': event.time.strftime("%H:%M") if isinstance(event.time, time) else event.time,
+            'publication_date': event.publication_date,
             # 'date': event.date,
             # 'time': event.time,
             'location': event.location,

@@ -260,8 +260,7 @@ def sample_event():
     return Event(
         id=1,
         title="Событие 1",
-        date=date(2023, 10, 15),
-        time=time(14, 0),
+        publication_date=date(2023, 10, 1),
         location="Москва",
         description="Описание события 1",
     )
@@ -362,8 +361,7 @@ def route_event():
     event = Event(
         title="Event1",
         description="Description1",
-        date=date(2023, 10, 1),
-        time=time(10, 0),
+        publication_date=date(2023, 10, 1),
         location="Location1",
     )
     db.session.add(event)

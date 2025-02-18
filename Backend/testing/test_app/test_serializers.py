@@ -1,3 +1,4 @@
+import datetime
 # Backend/testing/test_app/test_serializers.py
 from app.serializers import (
     serialize_author,
@@ -32,7 +33,7 @@ class TestNewsSerializer:
 class TestEventSerializer:
     def test_serialize_event_time_format(self, sample_event):
         result = serialize_events(sample_event)
-        assert result["time"] == "14:00"
+        assert result["publication_date"] == datetime.date(2023, 10, 1)
 
 class TestProjectSerializer:
     def test_serialize_project_materials(self, sample_project):
