@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import SortButton from "../../components/SortButton/SortButton";
 import { useLocation } from "react-router-dom";
+import FilterButton from "../../components/FilterButtonAuthors/FilterButtonAuthors";
 
 // const SearchResults = () => {
 //   const location = useLocation();
@@ -102,6 +103,7 @@ const SearchResults = () => {
       <div className="news-header">
       <h2>Результаты поиска по запросу: "{query}"</h2>
         <SortButton onSort={handleSort} />
+        <FilterButton/>
       </div>
       {error && <p className="error-message">{error}</p>}
       {searchResults ? (
