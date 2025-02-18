@@ -197,8 +197,8 @@ def get_sort_params(sort_type):
     sort_mapping = {
         SortType.ALPHABETICAL: {"sort_key": "title", "reverse": False},
         SortType.REVERSE_ALPHABETICAL: {"sort_key": "title", "reverse": True},
-        SortType.DATE_ASC: {"sort_key": "date", "reverse": False},
-        SortType.DATE_DESC: {"sort_key": "date", "reverse": True},
+        SortType.DATE_ASC: {"sort_key": "publication_date", "reverse": False},
+        SortType.DATE_DESC: {"sort_key": "publication_date", "reverse": True},
     }
     return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
 
