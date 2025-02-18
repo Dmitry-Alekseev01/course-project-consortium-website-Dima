@@ -99,7 +99,10 @@ const SearchResults = () => {
   return (
     <div>
       <Navbar/>
+      <div className="news-header">
       <h2>Результаты поиска по запросу: "{query}"</h2>
+        <SortButton onSort={handleSort} />
+      </div>
       {error && <p className="error-message">{error}</p>}
       {searchResults ? (
         Object.keys(searchResults).map((category) =>
@@ -119,7 +122,6 @@ const SearchResults = () => {
       ) : (
         <p>Загрузка...</p>
       )}
-      <SortButton onSort={handleSort}/>
       <Footer/>
     </div>
   );
