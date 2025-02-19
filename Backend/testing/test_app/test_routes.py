@@ -286,6 +286,132 @@ class TestSearchRoutes:
         response = client.get('/api/search?')
         assert response.status_code == 400
 
+
+    def test_search_with_authors_filter(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event):
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [mock_news],
+            [mock_publications],
+            [mock_project],
+            [mock_event],
+            [],  # Организации
+            [],  # Авторы
+            []   # Журналы
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        response = client.get('/api/search?q=Test&authors[]=1&authors[]=2')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['projects']) == 1
+        assert len(data['events']) == 1
+        assert len(data['organisations']) == 0
+        assert len(data['authors']) == 0
+        assert len(data['magazines']) == 0
+
+    def test_search_with_magazines_filter(self, client, mock_db_session, mock_news, mock_publications):
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [mock_news],
+            [mock_publications],
+            [],  # Проекты
+            [],  # Организации
+            [],  # Авторы
+            [],   # Журналы
+            []
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        response = client.get('/api/search?q=Test&magazines[]=1&magazines[]=2')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['projects']) == 0
+        assert len(data['organisations']) == 0
+        assert len(data['authors']) == 0
+        assert len(data['magazines']) == 0
+
+    def test_search_with_date_filter(self, client, mock_db_session, mock_news, mock_publications, mock_event, mock_project):
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [mock_news],
+            [mock_publications],
+            [mock_project],
+            [mock_event],
+            [],
+            [],
+            []
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        response = client.get('/api/search?q=Test&date_from=2023-01-01&date_to=2023-12-31')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['projects']) == 1
+        assert len(data['events']) == 1
+        assert len(data['organisations']) == 0
+        assert len(data['authors']) == 0
+        assert len(data['magazines']) == 0
+
+    def test_search_with_combined_filters(self, client, mock_db_session, mock_news, mock_publications):
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [mock_news],  # Новости
+            [mock_publications],  # Публикации
+            [],  # Проекты
+            [],  # Организации
+            [],  # Авторы
+            [],  # Журналы
+            []   # Что-то там еще
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        response = client.get('/api/search?q=Test&authors[]=1&magazines[]=1&date_from=2023-01-01&date_to=2023-12-31')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['projects']) == 0
+        assert len(data['events']) == 0
+        assert len(data['organisations']) == 0
+        assert len(data['authors']) == 0
+        assert len(data['magazines']) == 0
+
+    def test_search_with_no_results(self, client, mock_db_session):
+        # Пустые результаты
+        mock_scalars = MagicMock()
+        mock_scalars.all.side_effect = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+        mock_db_session.scalars.return_value = mock_scalars
+
+        response = client.get('/api/search?q=Test&authors[]=999&magazines[]=999&date_from=2025-01-01&date_to=2025-12-31')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 0
+        assert len(data['publications']) == 0
+        assert len(data['projects']) == 0
+        assert len(data['events']) == 0
+        assert len(data['organisations']) == 0
+        assert len(data['authors']) == 0
+        assert len(data['magazines']) == 0
+
 class TestUploadsFile:
     def test_uploaded_wrong_file(self, client):
         response = client.get("/uploads/goal")
