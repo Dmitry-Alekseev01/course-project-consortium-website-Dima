@@ -8,7 +8,7 @@ const AuthorFilter = ({ onApply }) => {
 
   // Загрузка авторов с бэкенда
   useEffect(() => {
-    fetch('/api/authors')
+    fetch('http://127.0.0.1:5000/api/authors')
       .then(res => res.json())
       .then(data => setAuthors(data))
       .catch(console.error);
