@@ -50,9 +50,13 @@ class Config:
         'SECRET_KEY',
     )
 
-    BASIC_AUTH_USERNAME = 'john'
-    BASIC_AUTH_PASSWORD = 'matrix'
+    BASIC_AUTH_USERNAME=os.environ.get('BASIC_AUTH_USERNAME')
+    BASIC_AUTH_PASSWORD=os.environ.get('BASIC_AUTH_PASSWORD')
+  
     #BASIC_AUTH_FORCE = True
 
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI= 'sqlite:///:memory:'
+    BASIC_AUTH_USERNAME = 'admin'
+    BASIC_AUTH_PASSWORD = 'password'
+    #WTF_CSRF_ENABLED = False  # Отключаем CSRF для тестов

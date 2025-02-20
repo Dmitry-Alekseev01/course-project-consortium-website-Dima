@@ -1,8 +1,8 @@
 Flask==3.0.3
-Flask-SQLAlchemy==3.0.3
-psycopg2-binary==2.9.5
+Flask-SQLAlchemy==3.1.1
+psycopg2-binary==2.9.10
 Flask-Cors==3.0.10
-Flask-Mail==0.9.1
+Flask-Mail==0.10.0
 python-dotenv==1.0.1
 Flask-Migrate==4.1.0
 Flask-Admin==1.6.1

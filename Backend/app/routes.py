@@ -183,40 +183,20 @@ def get_magazines():
 def get_author_by_id(author_id):
     author = db.session.get(Author, author_id) 
     if author:
-        return jsonify(serializers.serialize_author(author)), 200
+        return {'id': author.id, 'first_name': author.first_name, 
+                     'last_name': author.last_name, 'middle_name': author.middle_name}, 200
     else:
         return jsonify({'error': 'автор не найден'}), 404
 
 # Маршрут для получения всех авторов
 @main.route('/api/authors', methods=['GET'])
 def get_authors():
-    authors = db.session.scalars(sa_select(Author)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
+    authors = db.session.scalars(sa_select(Author)).all() 
     authors_list = [{'id': author.id, 'first_name': author.first_name, 
                      'last_name': author.last_name, 'middle_name': author.middle_name} 
                     for author in authors]
     return jsonify(authors_list), 200
 
-
-def get_and_sort_results(model, filters, sort_key=None, reverse=False):
-    results = db.session.scalars(sa_select(model).filter(*filters)).all()
-    if sort_key:
-        results = sorted(results, key=lambda x: getattr(x, sort_key), reverse=reverse)
-    return results
-
-class SortType(Enum):
-    ALPHABETICAL = auto()  # Сортировка по алфавиту
-    REVERSE_ALPHABETICAL = auto()  # Сортировка в обратном алфавитном порядке
-    DATE_ASC = auto()  # Сортировка по дате (по возрастанию)
-    DATE_DESC = auto()  # Сортировка по дате (по убыванию)
-
-def get_sort_params(sort_type):
-    sort_mapping = {
-        SortType.ALPHABETICAL: {"sort_key": "title", "reverse": False},
-        SortType.REVERSE_ALPHABETICAL: {"sort_key": "title", "reverse": True},
-        SortType.DATE_ASC: {"sort_key": "publication_date", "reverse": False},
-        SortType.DATE_DESC: {"sort_key": "publication_date", "reverse": True},
-    }
-    return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
 
 
 # Это старый рабочий метод НЕ УДАЛЯТЬ
@@ -486,30 +466,39 @@ def get_sort_params(sort_type):
 #     return jsonify(results)
 
 
-@main.route('/api/search', methods=['GET'])
-def search():
-    query = request.args.get('q', '').strip()
-    sort_type_str = request.args.get('sort', '').strip()
-    authors = request.args.getlist('authors[]')
-    magazines = request.args.getlist('magazines[]')
-    date_from = request.args.get('date_from', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
-    date_to = request.args.get('date_to', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
+def get_and_sort_results(model, filters, sort_key=None, reverse=False):
+    # if filters:
+    #     # print(filters) # ТУТ ПАДАЕТ
+    #     # print("ТУТ ПАДАЕТ")
+    #     results = db.session.scalars(sa_select(model).filter(*filters)).all()
+    # else:
+    #     results = db.session.scalars(sa_select(model)).all()
+    results = db.session.scalars(sa_select(model).filter(*filters)).all()
+    if sort_key:
+        results = sorted(results, key=lambda x: getattr(x, sort_key), reverse=reverse)
+    return results
 
-    if not query:
-        return jsonify({"error": "Пустой запрос"}), 400
+class SortType(Enum):
+    ALPHABETICAL = auto()  # Сортировка по алфавиту
+    REVERSE_ALPHABETICAL = auto()  # Сортировка в обратном алфавитном порядке
+    DATE_ASC = auto()  # Сортировка по дате (по возрастанию)
+    DATE_DESC = auto()  # Сортировка по дате (по убыванию)
 
-    try:
-        sort_type = SortType[sort_type_str.upper()]
-    except KeyError:
-        sort_type = None
+def get_sort_params(sort_type):
+    sort_mapping = {
+        SortType.ALPHABETICAL: {"sort_key": "title", "reverse": False},
+        SortType.REVERSE_ALPHABETICAL: {"sort_key": "title", "reverse": True},
+        SortType.DATE_ASC: {"sort_key": "publication_date", "reverse": False},
+        SortType.DATE_DESC: {"sort_key": "publication_date", "reverse": True},
+    }
+    return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
 
-    sort_params = get_sort_params(sort_type)
-    sort_key = sort_params["sort_key"]
-    reverse = sort_params["reverse"]
-    search_pattern = f"%{query}%"
-
-    # Базовые фильтры для новостей, публикаций, проектов и событий
-    base_filters = {
+def build_filters(search_pattern, authors, magazines, date_from, date_to):
+    """
+    Формирует словарь базовых фильтров для каждой категории поиска.
+    Добавляет дополнительные фильтры (авторы, журналы, диапазон дат) только если они заданы.
+    """
+    filters = {
         "news": [
             (News.title.ilike(search_pattern)) |
             (News.description.ilike(search_pattern)) |
@@ -534,30 +523,61 @@ def search():
         ]
     }
 
-    # Дополнительные фильтры для авторов и журналов
+    # Добавляем фильтр по авторам, если они заданы
     if authors:
-        base_filters["news"].append(News.authors.any(Author.id.in_(authors)))
-        base_filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
-        base_filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
+        filters["news"].append(News.authors.any(Author.id.in_(authors)))
+        filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
+        filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
 
+    # Фильтр по журналам
     if magazines:
-        base_filters["news"].append(News.magazine_id.in_(magazines))
-        base_filters["publications"].append(Publications.magazine_id.in_(magazines))
+        filters["news"].append(News.magazine_id.in_(magazines))
+        filters["publications"].append(Publications.magazine_id.in_(magazines))
 
+    # Фильтр по диапазону дат
     if date_from and date_to:
-        base_filters["news"].append(News.publication_date.between(date_from, date_to))
-        base_filters["publications"].append(Publications.publication_date.between(date_from, date_to))
-        base_filters["events"].append(Event.publication_date.between(date_from, date_to))
-        base_filters["projects"].append(Project.publication_date.between(date_from, date_to))
+        filters["news"].append(News.publication_date.between(date_from, date_to))
+        filters["publications"].append(Publications.publication_date.between(date_from, date_to))
+        filters["events"].append(Event.publication_date.between(date_from, date_to))
+        filters["projects"].append(Project.publication_date.between(date_from, date_to))
 
-    # Получение данных для каждой категории
+    return filters
+
+
+@main.route('/api/search', methods=['GET'])
+def search():
+    query = request.args.get('q', '').strip()
+    sort_type_str = request.args.get('sort', '').strip()
+    # Отфильтровываем пустые значения и преобразуем в int, если требуется
+    authors = [int(a) for a in request.args.getlist('authors[]') if a.strip().isdigit()]
+    magazines = [int(m) for m in request.args.getlist('magazines[]') if m.strip().isdigit()]
+    date_from = request.args.get('date_from', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
+    date_to = request.args.get('date_to', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
+
+    if not query:
+        return jsonify({"error": "Пустой запрос"}), 400
+
+    try:
+        sort_type = SortType[sort_type_str.upper()]
+    except KeyError:
+        sort_type = None
+
+    sort_params = get_sort_params(sort_type)
+    sort_key = sort_params["sort_key"]
+    reverse = sort_params["reverse"]
+    search_pattern = f"%{query}%"
+
+    # Получаем базовые фильтры через отдельную функцию
+    base_filters = build_filters(search_pattern, authors, magazines, date_from, date_to)
+
+    # Получение результатов с использованием корректных фильтров
     news_results = get_and_sort_results(News, base_filters["news"], sort_key=sort_key, reverse=reverse)
     publications_results = get_and_sort_results(Publications, base_filters["publications"], sort_key=sort_key, reverse=reverse)
     events_results = get_and_sort_results(Event, base_filters["events"], sort_key=sort_key, reverse=reverse)
     projects_results = get_and_sort_results(Project, base_filters["projects"], sort_key=sort_key, reverse=reverse)
     organisations_results = db.session.scalars(sa_select(Organisation).filter(*base_filters["organisations"])).all()
 
-    # Получение авторов и журналов через связи с новостями, публикациями и проектами
+    # Сбор авторов и журналов из найденных записей
     authors_results = set()
     magazines_results = set()
 
@@ -574,13 +594,12 @@ def search():
     for project in projects_results:
         authors_results.update(project.authors)
 
-
     results = {
         "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
         "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
         "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
         "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
-        "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
+        "organisations": [{"id": o.id, "link": f"/organisations/{o.id}"} for o in organisations_results],
         "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
         "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
     }
