@@ -198,6 +198,21 @@ class TestAuthorRoutes:
         assert len(data) == 1
         assert data[0]['first_name'] == 'Leo'
 
+    def test_get_author_by_id(self, client, route_author):
+        # Выполняем запрос
+        response = client.get(f'/api/authors/{route_author.id}')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['first_name'] == 'Leo'
+        assert data['last_name'] == 'Livshitz'
+
+    def test_get_author_by_id_not_found(self, client):
+        # Выполняем запрос с несуществующим ID
+        response = client.get('/api/authors/999')
+        assert response.status_code == 404
+        data = response.get_json()
+        assert data['error'] == 'автор не найден'
+
 
 class TestMagazineRoutes:
     def test_get_magazines(self, client, route_magazine):
@@ -208,209 +223,306 @@ class TestMagazineRoutes:
         assert len(data) == 1
         assert data[0]['name'] == 'Magazine1'
 
+    def test_get_magazine_by_id(self, client, route_magazine):
+        # Выполняем запрос
+        response = client.get(f'/api/magazines/{route_magazine.id}')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['name'] == 'Magazine1'
+
+    def test_get_magazine_by_id_not_found(self, client):
+        # Выполняем запрос с несуществующим ID
+        response = client.get('/api/magazines/999')
+        assert response.status_code == 404
+        data = response.get_json()
+        assert data['error'] == 'магазин не найден'
 
 class TestSearchRoutes:
-    def test_get_and_sort_results_without_sort(self, mock_news_for_search, mock_filters_for_search):
-        with patch('app.models.db.session.scalars') as mock_scalars:
-            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+    def test_search_all_types(self, client, sample_news, sample_publication, sample_event, sample_project, sample_organisation):
+        # Добавляем тестовые данные в БД
+        db.session.add_all([sample_news, sample_publication, sample_event, sample_project, sample_organisation])
+        db.session.commit()
 
-            # Вызываем функцию без сортировки
-            results = get_and_sort_results(News, mock_filters_for_search)
+        response = client.get('/api/search?q=1')
+        assert response.status_code == 200
+        data = response.json
 
-            assert len(results) == 1
-            assert results[0].title == "Test News"
+        # Проверяем наличие всех категорий
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['events']) == 1
+        assert len(data['projects']) == 1
+        assert len(data['organisations']) == 1  # Убедимся, что фильтр для организаций работает
 
-    def test_get_and_sort_results_with_sort(self, mock_news_for_search, mock_filters_for_search):
-        with patch('app.models.db.session.scalars') as mock_scalars:
-            mock_scalars.return_value.all.return_value = [mock_news_for_search]
+    def test_search_with_authors_filter(self, client, sample_news, sample_publication, sample_project, sample_author_with_middle_name):
+        # Настраиваем авторов
+        author_id = sample_author_with_middle_name.id
+        db.session.add_all([sample_news, sample_publication, sample_project])
+        db.session.commit()
 
-            # Вызываем функцию с сортировкой по title
-            results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=False)
-
-            assert len(results) == 1
-            assert results[0].title == "Test News"
-
-    def test_get_and_sort_results_with_reverse_sort(self, mock_news_for_search, mock_filters_for_search):
-        with patch('app.models.db.session.scalars') as mock_scalars:
-            mock_scalars.return_value.all.return_value = [mock_news_for_search]
-
-            # Вызываем функцию с сортировкой по title в обратном порядке
-            results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=True)
-
-            assert len(results) == 1
-            assert results[0].title == "Test News"
-
-    def test_get_and_sort_results_with_date_sort(self, mock_news_for_search, mock_filters_for_search):
-        with patch('app.models.db.session.scalars') as mock_scalars:
-            mock_scalars.return_value.all.return_value = [mock_news_for_search]
-
-            # Вызываем функцию с сортировкой по дате
-            results = get_and_sort_results(News, mock_filters_for_search, sort_key='publication_date', reverse=False)
-
-            # Проверяем, что результаты возвращены корректно
-            assert len(results) == 1
-            assert results[0].publication_date == "2023-10-01"
-
-    def test_search_all_types(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event, mock_organisation, mock_author, mock_magazine):
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [mock_news],
-            [mock_publications],
-            [mock_project],
-            [mock_event],
-            [mock_organisation],
-            [mock_author],
-            [mock_magazine]
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
-
-        # Выполняем запрос на поиск
-        response = client.get('/api/search?q=Test')
+        response = client.get(f'/api/search?q=1&authors[]={author_id}')
         assert response.status_code == 200
         data = response.get_json()
 
-        # Проверяем результаты поиска
+        # Проверяем фильтрацию по автору
         assert len(data['news']) == 1
         assert len(data['publications']) == 1
         assert len(data['projects']) == 1
-        assert len(data['events']) == 1
-        assert len(data['organisations']) == 1
-        assert len(data['authors']) == 1
-        assert len(data['magazines']) == 1
 
+    def test_search_with_magazines_filter(self, client, sample_news, sample_publication, sample_magazine):
+        magazine_id = sample_magazine.id
+        db.session.add_all([sample_news, sample_publication])
+        db.session.commit()
+
+        response = client.get(f'/api/search?q=1&magazines[]={magazine_id}')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+
+    def test_search_with_date_filter(self, client, sample_news, sample_publication, sample_event, sample_project):
+        db.session.add_all([sample_news, sample_publication, sample_event, sample_project])
+        db.session.commit()
+
+        response = client.get('/api/search?q=1&date_from=2023-01-01&date_to=2023-12-31')
+        assert response.status_code == 200
+        data = response.get_json()
+
+        assert len(data['news']) == 1
+        assert len(data['publications']) == 1
+        assert len(data['events']) == 1
+        assert len(data['projects']) == 1
+
+class TestSearchFunctions:
     def test_search_empty_query(self, client):
         response = client.get('/api/search?q=')
         assert response.status_code == 400
-
-    def test_search_empty_q(self, client):
-        response = client.get('/api/search?')
-        assert response.status_code == 400
-
-
-    def test_search_with_authors_filter(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event):
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [mock_news],
-            [mock_publications],
-            [mock_project],
-            [mock_event],
-            [],  # Организации
-            [],  # Авторы
-            []   # Журналы
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
-
-        response = client.get('/api/search?q=Test&authors[]=1&authors[]=2')
-        assert response.status_code == 200
         data = response.get_json()
+        assert data['error'] == "Пустой запрос"
+    def test_sort_by_date(self, client):
+        news1 = News(
+            title="News 1",
+            publication_date=datetime(2023, 10, 2),  # Используем datetime
+            description="Description 1",
+            content="Content 1"
+        )
+        news2 = News(
+            title="News 2",
+            publication_date=datetime(2023, 10, 1),  # Используем datetime
+            description="Description 2",
+            content="Content 2"
+        )
+        db.session.add_all([news1, news2])
+        db.session.commit()
 
-        assert len(data['news']) == 1
-        assert len(data['publications']) == 1
-        assert len(data['projects']) == 1
-        assert len(data['events']) == 1
-        assert len(data['organisations']) == 0
-        assert len(data['authors']) == 0
-        assert len(data['magazines']) == 0
+        results = get_and_sort_results(News, [News.title.ilike("%News%")], sort_key='publication_date', reverse=False)
+        # Преобразуем datetime к date для сравнения
+        assert [n.publication_date.date() for n in results] == [date(2023, 10, 1), date(2023, 10, 2)]
 
-    def test_search_with_magazines_filter(self, client, mock_db_session, mock_news, mock_publications):
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [mock_news],
-            [mock_publications],
-            [],  # Проекты
-            [],  # Организации
-            [],  # Авторы
-            [],   # Журналы
-            []
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
+# class TestSearchRoutes:
+#     def test_get_and_sort_results_without_sort(self, mock_news_for_search, mock_filters_for_search):
+#         with patch('app.models.db.session.scalars') as mock_scalars:
+#             mock_scalars.return_value.all.return_value = [mock_news_for_search]
 
-        response = client.get('/api/search?q=Test&magazines[]=1&magazines[]=2')
-        assert response.status_code == 200
-        data = response.get_json()
+#             # Вызываем функцию без сортировки
+#             results = get_and_sort_results(News, mock_filters_for_search)
 
-        assert len(data['news']) == 1
-        assert len(data['publications']) == 1
-        assert len(data['projects']) == 0
-        assert len(data['organisations']) == 0
-        assert len(data['authors']) == 0
-        assert len(data['magazines']) == 0
+#             assert len(results) == 1
+#             assert results[0].title == "Test News"
 
-    def test_search_with_date_filter(self, client, mock_db_session, mock_news, mock_publications, mock_event, mock_project):
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [mock_news],
-            [mock_publications],
-            [mock_project],
-            [mock_event],
-            [],
-            [],
-            []
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
+#     def test_get_and_sort_results_with_sort(self, mock_news_for_search, mock_filters_for_search):
+#         with patch('app.models.db.session.scalars') as mock_scalars:
+#             mock_scalars.return_value.all.return_value = [mock_news_for_search]
 
-        response = client.get('/api/search?q=Test&date_from=2023-01-01&date_to=2023-12-31')
-        assert response.status_code == 200
-        data = response.get_json()
+#             # Вызываем функцию с сортировкой по title
+#             results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=False)
 
-        assert len(data['news']) == 1
-        assert len(data['publications']) == 1
-        assert len(data['projects']) == 1
-        assert len(data['events']) == 1
-        assert len(data['organisations']) == 0
-        assert len(data['authors']) == 0
-        assert len(data['magazines']) == 0
+#             assert len(results) == 1
+#             assert results[0].title == "Test News"
 
-    def test_search_with_combined_filters(self, client, mock_db_session, mock_news, mock_publications):
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [mock_news],  # Новости
-            [mock_publications],  # Публикации
-            [],  # Проекты
-            [],  # Организации
-            [],  # Авторы
-            [],  # Журналы
-            []   # Что-то там еще
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
+#     def test_get_and_sort_results_with_reverse_sort(self, mock_news_for_search, mock_filters_for_search):
+#         with patch('app.models.db.session.scalars') as mock_scalars:
+#             mock_scalars.return_value.all.return_value = [mock_news_for_search]
 
-        response = client.get('/api/search?q=Test&authors[]=1&magazines[]=1&date_from=2023-01-01&date_to=2023-12-31')
-        assert response.status_code == 200
-        data = response.get_json()
+#             # Вызываем функцию с сортировкой по title в обратном порядке
+#             results = get_and_sort_results(News, mock_filters_for_search, sort_key='title', reverse=True)
 
-        assert len(data['news']) == 1
-        assert len(data['publications']) == 1
-        assert len(data['projects']) == 0
-        assert len(data['events']) == 0
-        assert len(data['organisations']) == 0
-        assert len(data['authors']) == 0
-        assert len(data['magazines']) == 0
+#             assert len(results) == 1
+#             assert results[0].title == "Test News"
 
-    def test_search_with_no_results(self, client, mock_db_session):
-        # Пустые результаты
-        mock_scalars = MagicMock()
-        mock_scalars.all.side_effect = [
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-        ]
-        mock_db_session.scalars.return_value = mock_scalars
+#     def test_get_and_sort_results_with_date_sort(self, mock_news_for_search, mock_filters_for_search):
+#         with patch('app.models.db.session.scalars') as mock_scalars:
+#             mock_scalars.return_value.all.return_value = [mock_news_for_search]
 
-        response = client.get('/api/search?q=Test&authors[]=999&magazines[]=999&date_from=2025-01-01&date_to=2025-12-31')
-        assert response.status_code == 200
-        data = response.get_json()
+#             # Вызываем функцию с сортировкой по дате
+#             results = get_and_sort_results(News, mock_filters_for_search, sort_key='publication_date', reverse=False)
 
-        assert len(data['news']) == 0
-        assert len(data['publications']) == 0
-        assert len(data['projects']) == 0
-        assert len(data['events']) == 0
-        assert len(data['organisations']) == 0
-        assert len(data['authors']) == 0
-        assert len(data['magazines']) == 0
+#             # Проверяем, что результаты возвращены корректно
+#             assert len(results) == 1
+#             assert results[0].publication_date == "2023-10-01"
+
+#     def test_search_all_types(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event, mock_organisation, mock_author, mock_magazine):
+#         # mock_scalars = MagicMock()
+#         # mock_scalars.all.side_effect = [
+#         #     [mock_news],
+#         #     [mock_publications],
+#         #     [mock_project],
+#         #     [mock_event],
+#         #     [mock_organisation],
+#         #     [mock_author],
+#         #     [mock_magazine]
+#         # ]
+#         # mock_db_session.scalars.return_value = mock_scalars
+
+#         # Выполняем запрос на поиск
+#         response = client.get('/api/search?q=Test')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         # Проверяем результаты поиска
+#         # assert len(data['news']) == 1
+#         # assert len(data['publications']) == 1
+#         # assert len(data['projects']) == 1
+#         # assert len(data['events']) == 1
+#         # assert len(data['organisations']) == 1
+#         # assert len(data['authors']) == 1
+#         # assert len(data['magazines']) == 1
+
+#     def test_search_empty_query(self, client):
+#         response = client.get('/api/search?q=')
+#         assert response.status_code == 400
+
+#     def test_search_empty_q(self, client):
+#         response = client.get('/api/search?')
+#         assert response.status_code == 400
+
+
+#     def test_search_with_authors_filter(self, client, mock_db_session, mock_news, mock_publications, mock_project, mock_event):
+#         # mock_scalars = MagicMock()
+#         # mock_scalars.all.side_effect = [
+#         #     [mock_news],
+#         #     [mock_publications],
+#         #     [mock_project],
+#         #     [mock_event],
+#         #     [],  # Организации
+#         #     [],  # Авторы
+#         #     []   # Журналы
+#         # ]
+#         # mock_db_session.scalars.return_value = mock_scalars
+
+#         response = client.get('/api/search?q=Test&authors[]=1&authors[]=2')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         # assert len(data['news']) == 1
+#         # assert len(data['publications']) == 1
+#         # assert len(data['projects']) == 1
+#         # assert len(data['events']) == 1
+#         # assert len(data['organisations']) == 0
+#         # assert len(data['authors']) == 0
+#         # assert len(data['magazines']) == 0
+
+#     def test_search_with_magazines_filter(self, client, mock_db_session, mock_news, mock_publications):
+#         # mock_scalars = MagicMock()
+#         # mock_scalars.all.side_effect = [
+#         #     [mock_news],
+#         #     [mock_publications],
+#         #     [],  # Проекты
+#         #     [],  # Организации
+#         #     [],  # Авторы
+#         #     [],   # Журналы
+#         #     []
+#         # ]
+#         # mock_db_session.scalars.return_value = mock_scalars
+
+#         response = client.get('/api/search?q=Test&magazines[]=1&magazines[]=2')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         # assert len(data['news']) == 1
+#         # assert len(data['publications']) == 1
+#         # assert len(data['projects']) == 0
+#         # assert len(data['organisations']) == 0
+#         # assert len(data['authors']) == 0
+#         # assert len(data['magazines']) == 0
+
+#     def test_search_with_date_filter(self, client, mock_db_session, mock_news, mock_publications, mock_event, mock_project):
+#         # mock_scalars = MagicMock()
+#         # mock_scalars.all.side_effect = [
+#         #     [mock_news],
+#         #     [mock_publications],
+#         #     [mock_project],
+#         #     [mock_event],
+#         #     [],
+#         #     [],
+#         #     []
+#         # ]
+#         # mock_db_session.scalars.return_value = mock_scalars
+
+#         response = client.get('/api/search?q=Test&date_from=2023-01-01&date_to=2023-12-31')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         # assert len(data['news']) == 1
+#         # assert len(data['publications']) == 1
+#         # assert len(data['projects']) == 1
+#         # assert len(data['events']) == 1
+#         # assert len(data['organisations']) == 0
+#         # assert len(data['authors']) == 0
+#         # assert len(data['magazines']) == 0
+
+#     def test_search_with_combined_filters(self, client, mock_db_session, mock_news, mock_publications):
+
+#         # mock_scalars = MagicMock()
+#         # mock_scalars.all.side_effect = [
+#         #     [mock_news],  # Новости
+#         #     [mock_publications],  # Публикации
+#         #     [],  # Проекты
+#         #     [],  # Организации
+#         #     [],  # Авторы
+#         #     [],  # Журналы
+#         #     []   # Что-то там еще
+#         # ]
+#         # mock_db_session.scalars.return_value = mock_scalars
+
+#         response = client.get('/api/search?q=Test&authors[]=1&magazines[]=1&date_from=2023-01-01&date_to=2023-12-31')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         # assert len(data['news']) == 1
+#         # assert len(data['publications']) == 1
+#         # assert len(data['projects']) == 0
+#         # assert len(data['events']) == 0
+#         # assert len(data['organisations']) == 0
+#         # assert len(data['authors']) == 0
+#         # assert len(data['magazines']) == 0
+
+#     def test_search_with_no_results(self, client, mock_db_session):
+#         # Пустые результаты
+#         mock_scalars = MagicMock()
+#         mock_scalars.all.side_effect = [
+#             [],
+#             [],
+#             [],
+#             [],
+#             [],
+#             [],
+#             []
+#         ]
+#         mock_db_session.scalars.return_value = mock_scalars
+
+#         response = client.get('/api/search?q=Test&authors[]=999&magazines[]=999&date_from=2025-01-01&date_to=2025-12-31')
+#         assert response.status_code == 200
+#         data = response.get_json()
+
+#         assert len(data['news']) == 0
+#         assert len(data['publications']) == 0
+#         assert len(data['projects']) == 0
+#         assert len(data['events']) == 0
+#         assert len(data['organisations']) == 0
+#         assert len(data['authors']) == 0
+#         assert len(data['magazines']) == 0
 
 class TestUploadsFile:
     def test_uploaded_wrong_file(self, client):

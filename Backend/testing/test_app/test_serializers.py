@@ -18,6 +18,7 @@ class TestAuthorSerializer:
         result = serialize_author(sample_author_without_middle_name)
         assert result == "Петров П." 
 
+
 class TestNewsSerializer:
     def test_serialize_news_with_magazine(self, sample_news):
         result = serialize_news(sample_news)
@@ -30,10 +31,12 @@ class TestNewsSerializer:
         result = serialize_news(sample_news)
         assert result["magazine"] is None
 
+
 class TestEventSerializer:
     def test_serialize_event_time_format(self, sample_event):
         result = serialize_events(sample_event)
         assert result["publication_date"] == datetime.date(2023, 10, 1)
+
 
 class TestProjectSerializer:
     def test_serialize_project_materials(self, sample_project):
@@ -44,10 +47,12 @@ class TestPublicationSerializer:
     def test_serialize_publication_authors(self, sample_publication):
         result = serialize_publications(sample_publication)
         assert set(result["authors"]) == {"Иванов И.И.", "Петров П."}
+
 class TestOrganisationSerializer:
     def test_serialize_organisation(self, sample_organisation):
         result = serialize_organisations(sample_organisation)
         
         assert result["id"] == 1
         assert result["image"] == "kitchen.jpg"
-        assert result["link"] == "https://t.me/vyshkochka"
+        assert result["link"] == "https://t.me/vyshkochka1"
+

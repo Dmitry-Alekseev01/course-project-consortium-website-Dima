@@ -298,7 +298,7 @@ def sample_organisation():
     return Organisation(
         id=1,
         image="kitchen.jpg",
-        link="https://t.me/vyshkochka",
+        link="https://t.me/vyshkochka1",
     )
 
 
@@ -474,14 +474,14 @@ def mock_contact_data():
 #             yield mock_send
 
 
-@fixture
-def mock_db_session():
-    """Мок для сессии базы данных."""
-    with patch('app.models.db.session') as mock_session:
-        mock_scalars = MagicMock()
-        mock_scalars.all.return_value = []
-        mock_session.scalars.return_value = mock_scalars
-        yield mock_session
+# @fixture
+# def mock_db_session():
+#     """Мок для сессии базы данных."""
+#     with patch('app.models.db.session') as mock_session:
+#         mock_scalars = MagicMock()
+#         mock_scalars.all.return_value = []
+#         mock_session.scalars.return_value = mock_scalars
+#         yield mock_session
 
 # @fixture
 # def mock_contact():
@@ -494,70 +494,70 @@ def mock_db_session():
 #     contact.message = "Test message"
 #     return contact
 
-@fixture
-def mock_news():
-    """Мок для модели News."""
-    news = MagicMock(spec=News)
-    news.id = 1
-    news.title = "Test News"
-    news.description = "Test Description"
-    news.content = "Test Content"
-    return news
+# @fixture
+# def mock_news():
+#     """Мок для модели News."""
+#     news = MagicMock(spec=News)
+#     news.id = 1
+#     news.title = "Test News"
+#     news.description = "Test Description"
+#     news.content = "Test Content"
+#     return news
 
-@fixture
-def mock_event():
-    """Мок для модели Event."""
-    event = MagicMock(spec=Event)
-    event.id = 1
-    event.title = "Test Event"
-    event.description = "Test Description"
-    event.location = "Test Location"
-    return event
+# @fixture
+# def mock_event():
+#     """Мок для модели Event."""
+#     event = MagicMock(spec=Event)
+#     event.id = 1
+#     event.title = "Test Event"
+#     event.description = "Test Description"
+#     event.location = "Test Location"
+#     return event
 
-@fixture
-def mock_project():
-    """Мок для модели Project."""
-    project = MagicMock(spec=Project)
-    project.id = 1
-    project.title = "Test Project"
-    project.description = "Test Description"
-    project.content = "Test Content"
-    return project
+# @fixture
+# def mock_project():
+#     """Мок для модели Project."""
+#     project = MagicMock(spec=Project)
+#     project.id = 1
+#     project.title = "Test Project"
+#     project.description = "Test Description"
+#     project.content = "Test Content"
+#     return project
 
-@fixture
-def mock_publications():
-    """Мок для модели Publications."""
-    publication = MagicMock(spec=Publications)
-    publication.id = 1
-    publication.title = "Test Publication"
-    publication.annotation = "Test Annotation"
-    return publication
+# @fixture
+# def mock_publications():
+#     """Мок для модели Publications."""
+#     publication = MagicMock(spec=Publications)
+#     publication.id = 1
+#     publication.title = "Test Publication"
+#     publication.annotation = "Test Annotation"
+#     return publication
 
-@fixture
-def mock_author():
-    """Мок для модели Author."""
-    author = MagicMock(spec=Author)
-    author.id = 1
-    author.first_name = "Test"
-    author.last_name = "Author"
-    author.middle_name = "Middle"
-    return author
+# @fixture
+# def mock_author():
+#     """Мок для модели Author."""
+#     author = MagicMock(spec=Author)
+#     author.id = 1
+#     author.first_name = "Test"
+#     author.last_name = "Author"
+#     author.middle_name = "Middle"
+#     return author
 
-@fixture
-def mock_magazine():
-    """Мок для модели Magazine."""
-    magazine = MagicMock(spec=Magazine)
-    magazine.id = 1
-    magazine.name = "Test Magazine"
-    return magazine
+# @fixture
+# def mock_magazine():
+#     """Мок для модели Magazine."""
+#     magazine = MagicMock(spec=Magazine)
+#     magazine.id = 1
+#     magazine.name = "Test Magazine"
+#     return magazine
 
-@fixture
-def mock_organisation():
-    """Мок для модели Organisation."""
-    organisation = MagicMock(spec=Organisation)
-    organisation.id = 1
-    organisation.link = "https://test.com"
-    return organisation
+# @fixture
+# def mock_organisation():
+#     """Мок для модели Organisation."""
+#     organisation = MagicMock(spec=Organisation)
+#     organisation.id = 1
+#     organisation.link = "https://test.com"
+#     return organisation
 
 # @fixture
 # def mock_admin():
@@ -604,12 +604,12 @@ def app_testing_mail():
 def client_mail(app_testing_mail):
     return app_testing_mail.test_client()
 
-@fixture
-def mock_news_for_search():
-    news = News(id=1, title="Test News", publication_date="2023-10-01")
-    return news
+# @fixture
+# def mock_news_for_search():
+#     news = News(id=1, title="Test News", publication_date="2023-10-01")
+#     return news
 
 
-@fixture
-def mock_filters_for_search():
-    return [News.title.ilike("%Test%")]
+# @fixture
+# def mock_filters_for_search():
+#     return [News.title.ilike("%Test%")]
