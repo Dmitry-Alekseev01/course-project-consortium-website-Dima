@@ -600,8 +600,8 @@ def search():
         "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
         "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
         "organisations": [{"id": o.id, "link": f"/organisations/{o.id}"} for o in organisations_results],
-        "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
-        "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
+        # "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
+        # "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
     }
 
     return jsonify(results)

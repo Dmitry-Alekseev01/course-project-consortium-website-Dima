@@ -1,80 +1,45 @@
 // import React, { useEffect, useState } from "react";
-// import "./SearchResult.css"
+// import "./SearchResult.css";
 // import Navbar from "../../components/Navbar/Navbar";
 // import Footer from "../../components/Footer/Footer";
 // import SortButton from "../../components/SortButton/SortButton";
-// import { useLocation } from "react-router-dom";
-// import FilterButton from "../../components/FilterButtonAuthors/FilterButtonAuthors";
-// import JournalFilter from "../../components/FilterButtonJournals/FilterButtonJournals";
-
-// // const SearchResults = () => {
-// //   const location = useLocation();
-// //   const query = new URLSearchParams(location.search).get("query");
-// //   const [searchResults, setSearchResults] = useState(null);
-// //   const [error, setError] = useState(null);
-
-// //   useEffect(() => {
-// //     if (query) {
-// //       performSearch(query);
-// //     }
-// //   }, [query]);
-
-// //   const performSearch = async (query) => {
-// //     try {
-// //       const response = await fetch(`http://127.0.0.1:5000/api/search?q=${encodeURIComponent(query)}`);
-// //       if (!response.ok) {
-// //         throw new Error(`Ошибка сервера: ${response.status}`);
-// //       }
-// //       const data = await response.json();
-// //       setSearchResults(data);
-// //       setError(null);
-// //     } catch (err) {
-// //       console.error("Ошибка при поиске:", err);
-// //       setError("Ошибка загрузки результатов поиска");
-// //     }
-// //   };
-
-// //   return (
-// //     <div>
-// //       <Navbar/>
-// //       <h2>Результаты поиска по запросу: "{query}"</h2>
-// //       {error && <p className="error-message">{error}</p>}
-// //       {searchResults ? (
-// //         Object.keys(searchResults).map((category) =>
-// //           searchResults[category].length > 0 ? (
-// //             <div key={category}>
-// //               <h4>{category.toUpperCase()}</h4>
-// //               <ul>
-// //                 {searchResults[category].map((item) => (
-// //                   <li key={item.id}>
-// //                     <a href={item.link || "#"}>{item.title}</a>
-// //                   </li>
-// //                 ))}
-// //               </ul>
-// //             </div>
-// //           ) : null
-// //         )
-// //       ) : (
-// //         <p>Загрузка...</p>
-// //       )}
-// //       <SortButton/>
-// //       <Footer/>
-// //     </div>
-// //   );
-// // };
-
-// // export default SearchResults;
-
+// import { useLocation, useHistory } from "react-router-dom";
+// import AuthorFilter from "../../components/FilterButtonAuthors/FilterButtonAuthors";
+// import MagazineFilter from "../../components/FilterButtonJournals/FilterButtonJournals";
+// // import DateFilter from "../../components/FilterButtonDate/FilterButtonDate";
 
 // const SearchResults = () => {
 //   const location = useLocation();
-//   const query = new URLSearchParams(location.search).get("query");
+//   const history = useHistory();
+//   const queryParams = new URLSearchParams(location.search);
+//   const query = queryParams.get("query");
+//   const sortType = queryParams.get("sort");
+//   const authors = queryParams.getAll("authors[]");
+//   const magazines = queryParams.getAll("magazines[]");
+//   const dateFrom = queryParams.get("dateFrom");
+//   const dateTo = queryParams.get("dateTo");
+
 //   const [searchResults, setSearchResults] = useState(null);
 //   const [error, setError] = useState(null);
+//   const [filters, setFilters] = useState({
+//     authors: authors,
+//     magazines: magazines,
+//     dateFrom: dateFrom || '',
+//     dateTo: dateTo || ''
+//   });
 
-//   const performSearch = async (query, sortType = null) => {
+//   const performSearch = async (query, sortType = null, filters = {}) => {
 //     try {
-//       const url = `http://127.0.0.1:5000/api/search?q=${encodeURIComponent(query)}${sortType ? `&sort=${sortType}` : ''}`;
+//       const params = new URLSearchParams({
+//         q: query,
+//         ...(sortType && { sort: sortType }),
+//         ...(filters.authors && { 'authors[]': filters.authors }),
+//         ...(filters.magazines && { 'magazines[]': filters.magazines }),
+//         ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
+//         ...(filters.dateTo && { dateTo: filters.dateTo })
+//       });
+
+//       const url = `http://127.0.0.1:5000/api/search?${params.toString()}`;
 //       const response = await fetch(url);
 //       if (!response.ok) {
 //         throw new Error(`Ошибка сервера: ${response.status}`);
@@ -90,22 +55,52 @@
 
 //   useEffect(() => {
 //     if (query) {
-//       performSearch(query);
+//       performSearch(query, sortType, filters);
 //     }
-//   }, [query]);
+//   }, [query, sortType, filters]);
 
 //   const handleSort = (sortType) => {
-//     performSearch(query, sortType);
+//     const params = new URLSearchParams(location.search);
+//     params.set("sort", sortType);
+//     history.push({ search: params.toString() });
 //   };
+
+//   const handleAuthorFilter = (authors) => {
+//     const params = new URLSearchParams(location.search);
+//     params.delete("authors[]");
+//     authors.forEach(author => params.append("authors[]", author));
+//     history.push({ search: params.toString() });
+//     setFilters(prev => ({ ...prev, authors }));
+//   };
+
+//   const handleMagazineFilter = (magazines) => {
+//     const params = new URLSearchParams(location.search);
+//     params.delete("magazines[]");
+//     magazines.forEach(magazine => params.append("magazines[]", magazine));
+//     history.push({ search: params.toString() });
+//     setFilters(prev => ({ ...prev, magazines }));
+//   };
+
+//   const handleDateFilter = ({ dateFrom, dateTo }) => {
+//     const params = new URLSearchParams(location.search);
+//     params.set("dateFrom", dateFrom);
+//     params.set("dateTo", dateTo);
+//     history.push({ search: params.toString() });
+//     setFilters(prev => ({ ...prev, dateFrom, dateTo }));
+//   };
+
+
+  
 
 //   return (
 //     <div>
-//       <Navbar/>
+//       <Navbar />
 //       <div className="news-header">
-//       <h2>Результаты поиска по запросу: "{query}"</h2>
+//         <h2>Результаты поиска по запросу: "{query}"</h2>
 //         <SortButton onSort={handleSort} />
-//         <FilterButton/>
-//         <JournalFilter/>
+//         <AuthorFilter onApply={handleAuthorFilter} />
+//         <MagazineFilter onApply={handleMagazineFilter} />
+//         {/* <DateFilter onApply={handleDateFilter} /> */}
 //       </div>
 //       {error && <p className="error-message">{error}</p>}
 //       {searchResults ? (
@@ -126,7 +121,7 @@
 //       ) : (
 //         <p>Загрузка...</p>
 //       )}
-//       <Footer/>
+//       <Footer />
 //     </div>
 //   );
 // };
@@ -134,26 +129,37 @@
 // export default SearchResults;
 
 
+
+
+
 import React, { useEffect, useState } from "react";
 import "./SearchResult.css";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import SortButton from "../../components/SortButton/SortButton";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthorFilter from "../../components/FilterButtonAuthors/FilterButtonAuthors";
 import MagazineFilter from "../../components/FilterButtonJournals/FilterButtonJournals";
 // import DateFilter from "../../components/FilterButtonDate/FilterButtonDate";
 
 const SearchResults = () => {
   const location = useLocation();
-  const query = new URLSearchParams(location.search).get("query");
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const query = queryParams.get("query");
+  const sortType = queryParams.get("sort");
+  const authors = queryParams.getAll("authors[]");
+  const magazines = queryParams.getAll("magazines[]");
+  const dateFrom = queryParams.get("dateFrom");
+  const dateTo = queryParams.get("dateTo");
+
   const [searchResults, setSearchResults] = useState(null);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    authors: [],
-    magazines: [],
-    dateFrom: '',
-    dateTo: ''
+    authors: authors,
+    magazines: magazines,
+    dateFrom: dateFrom || '',
+    dateTo: dateTo || ''
   });
 
   const performSearch = async (query, sortType = null, filters = {}) => {
@@ -163,8 +169,8 @@ const SearchResults = () => {
         ...(sortType && { sort: sortType }),
         ...(filters.authors && { 'authors[]': filters.authors }),
         ...(filters.magazines && { 'magazines[]': filters.magazines }),
-        ...(filters.dateFrom && { date_from: filters.dateFrom }),
-        ...(filters.dateTo && { date_to: filters.dateTo })
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
+        ...(filters.dateTo && { dateTo: filters.dateTo })
       });
 
       const url = `http://127.0.0.1:5000/api/search?${params.toString()}`;
@@ -183,28 +189,41 @@ const SearchResults = () => {
 
   useEffect(() => {
     if (query) {
-      performSearch(query);
+      performSearch(query, sortType, filters);
     }
-  }, [query]);
+  }, [query, sortType, filters]);
 
   const handleSort = (sortType) => {
-    performSearch(query, sortType, {});
+    const params = new URLSearchParams(location.search);
+    params.set("sort", sortType);
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   const handleAuthorFilter = (authors) => {
+    const params = new URLSearchParams(location.search);
+    params.delete("authors[]");
+    authors.forEach(author => params.append("authors[]", author));
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     setFilters(prev => ({ ...prev, authors }));
-    performSearch(query, null, { ...filters, authors });
   };
 
   const handleMagazineFilter = (magazines) => {
+    const params = new URLSearchParams(location.search);
+    params.delete("magazines[]");
+    magazines.forEach(magazine => params.append("magazines[]", magazine));
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     setFilters(prev => ({ ...prev, magazines }));
-    performSearch(query, null, { ...filters, magazines });
   };
 
   const handleDateFilter = ({ dateFrom, dateTo }) => {
+    const params = new URLSearchParams(location.search);
+    params.set("dateFrom", dateFrom);
+    params.set("dateTo", dateTo);
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     setFilters(prev => ({ ...prev, dateFrom, dateTo }));
-    performSearch(query, null, { ...filters, dateFrom, dateTo });
   };
+
+  
 
   return (
     <div>
