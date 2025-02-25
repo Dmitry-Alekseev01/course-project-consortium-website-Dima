@@ -91,7 +91,9 @@ def seed_all(app):
             for author_id in news_item["author_ids"]:
                 author = Author.query.get(author_id)
                 news.authors.append(author)
+            print(news.title_en)
             db.session.add(news)
+              # Автоматически переведено и закэшировано
         db.session.commit()
 
         # Тестовые данные для публикаций
