@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 from pathlib import Path
 #print(os.urandom(12).hex())
@@ -54,6 +55,9 @@ class Config:
     BASIC_AUTH_PASSWORD=os.environ.get('BASIC_AUTH_PASSWORD')
   
     #BASIC_AUTH_FORCE = True
+
+    CACHE_TYPE = 'SimpleCache'
+    CACHE_DEFAULT_TIMEOUT = 3600
 
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI= 'sqlite:///:memory:'
