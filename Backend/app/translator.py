@@ -46,7 +46,6 @@ from translate import Translator
 # from .cache import get_cached_translation
 
 def translate_to_english(text, translator=Translator(from_lang="ru", to_lang="en")):
-    """Перевод с русского на английский с кэшированием"""
     if not text or not isinstance(text, str):
         return text
 
@@ -60,8 +59,13 @@ def translate_to_english(text, translator=Translator(from_lang="ru", to_lang="en
         #     return cached
         
         # Если кэша нет — переводим и кэшируем
+        #print("Translation method")
         translated_text = translator.translate(text)
+        if "MYMEMORY WARNING" in translated_text:
+            raise Exception(translated_text)
+        #print(translated_text)
         return translated_text
     except Exception as e:
-        print(f"Translation error: {e}")
+        #print(f"Translation error: {e}")
+        #print(text)
         return text

@@ -256,11 +256,35 @@
 #     image = db.Column(db.String(200), nullable=False)
 #     link = db.Column(db.String(200), nullable=False)
 
+
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, time, date
 from .translator import translate_to_english
 
 db = SQLAlchemy()
+class TranslateMixin:
+    # translations = (
+    #     ('title', 'title_en'),
+    #     ('description', 'description_en')
+    # )
+    translations = ()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        for translation_from, translation_to in self.translations:
+            attribute_from = getattr(self, translation_from)
+            attribute_to = getattr(self, translation_to)
+            if attribute_from and not attribute_to:
+                translated_value = translate_to_english(attribute_from) or attribute_from
+                setattr(self, translation_to, translated_value)
+        # if self.title and not self.title_en:
+        #     self.title_en = translate_to_english(self.title) or self.title
+        
+        # if self.description and not self.description_en:
+        #     self.description_en = translate_to_english(self.description) or self.description
+        
+
 
 # Таблица для журналов
 class Magazine(db.Model):
@@ -304,7 +328,7 @@ class Contact(db.Model):
     message = db.Column(db.Text, nullable=False)
 
 # Модель для событий
-class Event(db.Model):
+class Event(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     title_en = db.Column(db.String(100), nullable=False)
@@ -316,18 +340,22 @@ class Event(db.Model):
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     description_en = db.Column(db.Text, nullable=False)
+    translations = (
+        ('title', 'title_en'),
+        ('description', 'description_en')
+    )
 
-    def __init__(self, **kwargs):
-        super(Event, self).__init__(**kwargs)
+    # def __init__(self, **kwargs):
+    #     super(Event, self).__init__(**kwargs)
         
-        if self.title and not self.title_en:
-            self.title_en = translate_to_english(self.title) or self.title
+    #     if self.title and not self.title_en:
+    #         self.title_en = translate_to_english(self.title) or self.title
         
-        if self.description and not self.description_en:
-            self.description_en = translate_to_english(self.description) or self.description
+    #     if self.description and not self.description_en:
+    #         self.description_en = translate_to_english(self.description) or self.description
 
 # Модель для новостей
-class News(db.Model):
+class News(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     title_en = db.Column(db.String(100), nullable=False)
@@ -340,15 +368,21 @@ class News(db.Model):
     materials = db.Column(db.String(300))  # Путь к файлу
     authors = db.relationship('Author', secondary=news_authors, lazy='subquery',
                               backref=db.backref('news', lazy=True), cascade="all, delete")
+    translations = (
+        ('title', 'title_en'),
+        ('description', 'description_en')
+    )
     
-    def __init__(self, **kwargs):
-        super(News, self).__init__(**kwargs)
+
+    
+    # def __init__(self, **kwargs):
+    #     super(News, self).__init__(**kwargs)
         
-        if self.title and not self.title_en:
-            self.title_en = translate_to_english(self.title) or self.title
+    #     if self.title and not self.title_en:
+    #         self.title_en = translate_to_english(self.title) or self.title
         
-        if self.description and not self.description_en:
-            self.description_en = translate_to_english(self.description) or self.description
+    #     if self.description and not self.description_en:
+    #         self.description_en = translate_to_english(self.description) or self.description
     
     
     # def __init__(self, **kwargs):
@@ -386,7 +420,7 @@ class News(db.Model):
     #     return getattr(self, field)
 
 # Модель для публикаций
-class Publications(db.Model):
+class Publications(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     title_en = db.Column(db.String(100), nullable=False)
@@ -396,19 +430,23 @@ class Publications(db.Model):
     annotation_en = db.Column(db.Text, nullable=False)
     authors = db.relationship('Author', secondary=publication_authors, lazy='subquery',
                               backref=db.backref('publications', lazy=True), cascade="all, delete")
+    translations = (
+        ('title', 'title_en'),
+        ('annotation', 'annotation_en')
+    )
 
     
-    def __init__(self, **kwargs):
-        super(Publications, self).__init__(**kwargs)
+    # def __init__(self, **kwargs):
+    #     super(Publications, self).__init__(**kwargs)
         
-        if self.title and not self.title_en:
-            self.title_en = translate_to_english(self.title) or self.title
+    #     if self.title and not self.title_en:
+    #         self.title_en = translate_to_english(self.title) or self.title
         
-        if self.annotation and not self.annotation_en:
-            self.annotation_en = translate_to_english(self.annotation) or self.annotation
+    #     if self.annotation and not self.annotation_en:
+    #         self.annotation_en = translate_to_english(self.annotation) or self.annotation
 
 # Модель для проектов
-class Project(db.Model):
+class Project(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     title_en = db.Column(db.String(100), nullable=False)
@@ -420,15 +458,18 @@ class Project(db.Model):
     materials = db.Column(db.String(300))  # Путь к файлу
     authors = db.relationship('Author', secondary=project_authors, lazy='subquery',
                               backref=db.backref('projects', lazy=True), cascade="all, delete")
-    
-    def __init__(self, **kwargs):
-        super(Project, self).__init__(**kwargs)
+    translations = (
+        ('title', 'title_en'),
+        ('description', 'description_en')
+    )
+    # def __init__(self, **kwargs):
+    #     super(Project, self).__init__(**kwargs)
         
-        if self.title and not self.title_en:
-            self.title_en = translate_to_english(self.title) or self.title
+    #     if self.title and not self.title_en:
+    #         self.title_en = translate_to_english(self.title) or self.title
         
-        if self.description and not self.description_en:
-            self.description_en = translate_to_english(self.description) or self.description
+    #     if self.description and not self.description_en:
+    #         self.description_en = translate_to_english(self.description) or self.description
 
 # Модель для организаций
 class Organisation(db.Model):
