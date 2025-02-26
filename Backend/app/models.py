@@ -341,40 +341,49 @@ class News(db.Model):
     authors = db.relationship('Author', secondary=news_authors, lazy='subquery',
                               backref=db.backref('news', lazy=True), cascade="all, delete")
     
-    
     def __init__(self, **kwargs):
         super(News, self).__init__(**kwargs)
+        
         if self.title and not self.title_en:
-            try:
-                self.title_en = translate_to_english(self.title)
-                if self.title_en is None:
-                    raise ValueError("Translation failed for title")
-            except Exception as e:
-                print(f"Error translating title: {e}")
-                self.title_en = self.title  # Fallback
-
+            self.title_en = translate_to_english(self.title) or self.title
+        
         if self.description and not self.description_en:
-            try:
-                self.description_en = translate_to_english(self.description)
-                if self.description_en is None:
-                    raise ValueError("Translation failed for description")
-            except Exception as e:
-                print(f"Error translating description: {e}")
-                self.description_en = self.description  # Fallback
+            self.description_en = translate_to_english(self.description) or self.description
+    
+    
+    # def __init__(self, **kwargs):
+    #     super(News, self).__init__(**kwargs)
+    #     if self.title and not self.title_en:
+    #         try:
+    #             self.title_en = translate_to_english(self.title)
+    #             if self.title_en is None:
+    #                 raise ValueError("Translation failed for title")
+    #         except Exception as e:
+    #             print(f"Error translating title: {e}")
+    #             self.title_en = self.title  # Fallback
 
-    def get_translated_field(self, field: str, language: str = 'ru') -> str:
-        """
-        Возвращает значение поля на указанном языке.
-        Если перевод отсутствует, возвращает значение на русском.
+    #     if self.description and not self.description_en:
+    #         try:
+    #             self.description_en = translate_to_english(self.description)
+    #             if self.description_en is None:
+    #                 raise ValueError("Translation failed for description")
+    #         except Exception as e:
+    #             print(f"Error translating description: {e}")
+    #             self.description_en = self.description  # Fallback
 
-        :param field: Название поля (например, 'title' или 'description').
-        :param language: Язык ('ru' или 'en').
-        :return: Значение поля на нужном языке.
-        """
-        if language == 'en':
-            translated_field = getattr(self, f"{field}_en")
-            return translated_field if translated_field else getattr(self, field)
-        return getattr(self, field)
+    # def get_translated_field(self, field: str, language: str = 'ru') -> str:
+    #     """
+    #     Возвращает значение поля на указанном языке.
+    #     Если перевод отсутствует, возвращает значение на русском.
+
+    #     :param field: Название поля (например, 'title' или 'description').
+    #     :param language: Язык ('ru' или 'en').
+    #     :return: Значение поля на нужном языке.
+    #     """
+    #     if language == 'en':
+    #         translated_field = getattr(self, f"{field}_en")
+    #         return translated_field if translated_field else getattr(self, field)
+    #     return getattr(self, field)
 
 # Модель для публикаций
 class Publications(db.Model):
