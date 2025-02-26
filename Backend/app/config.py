@@ -4,8 +4,11 @@ from datetime import timedelta
 
 from pathlib import Path
 #print(os.urandom(12).hex())
-dotenv_path = Path(__file__).resolve().parent / ".env"
-load_dotenv(dotenv_path=dotenv_path)
+#dotenv_path = Path(__file__).resolve().parent / ".env"
+# print("ROOOOOOOOT")
+# print(dotenv_path)
+# load_dotenv(dotenv_path=dotenv_path)
+load_dotenv()
 
 class Config:
     
