@@ -28,5 +28,5 @@ jobs:
     - name: Run tests
       run: |
         pwd
-        copy .env.example .env
+        cp .env.example .env
         pytest -s --cov --cov-report html --cov-fail-under 100
