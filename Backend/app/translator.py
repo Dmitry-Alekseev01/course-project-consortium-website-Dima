@@ -43,25 +43,24 @@
 
 
 from translate import Translator
-from .cache import get_cached_translation
+# from .cache import get_cached_translation
 
-def translate_to_english(text, translator=None):
+def translate_to_english(text, translator=Translator(from_lang="ru", to_lang="en")):
     """Перевод с русского на английский с кэшированием"""
     if not text or not isinstance(text, str):
         return text
 
     try:
-        if translator is None:
-            translator = Translator(from_lang="ru", to_lang="en")
+        # if translator is None:
+        #     translator = Translator(from_lang="ru", to_lang="en")
 
         # Проверка кэша
-        cached = get_cached_translation(text, translator, 'en')
-        if cached is not None:
-            return cached
+        # cached = get_cached_translation(text, translator, 'en')
+        # if cached is not None:
+        #     return cached
         
         # Если кэша нет — переводим и кэшируем
         translated_text = translator.translate(text)
-        # Здесь можно добавить логику сохранения в кэш (если есть)
         return translated_text
     except Exception as e:
         print(f"Translation error: {e}")

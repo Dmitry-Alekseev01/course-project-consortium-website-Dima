@@ -9,7 +9,7 @@ from flask import Response, redirect, Flask
 from flask_admin import AdminIndexView, Admin
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.exceptions import HTTPException
-from .cache import cache
+# from .cache import cache
 
 # Инициализация расширений
 mail = Mail()
@@ -74,7 +74,7 @@ def create_app(config_path = 'app.config.Config', mail = mail):
     #admin = Admin(name='Admin Panel', template_mode='bootstrap3')
     admin.init_app(app)
 
-    cache.init_app(app)
+    # cache.init_app(app)
 
     # Регистрация представлений Flask-Admin
     register_admin_views(admin, db)  # Вызов функции
