@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./Events.css";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { Link } from "react-router-dom";
@@ -18,9 +17,9 @@ const Events = () => {
     <div className="page">
       <Navbar />
       <h1>События</h1>
-      <div className="events-list">
+      <div className="projects-list">
         {events.map((event) => (
-          <div key={event.id} className="event">
+          <div key={event.id} className="project">
             <h2>{event.title}</h2>
             <p>{event.description}</p>
             {/* <p><strong>Дата:</strong> {event.date}</p>

@@ -1,7 +1,7 @@
 .aboutUs {
     align-items: center;
     text-align: center;
-    height: 100; /* Занимает всю высоту экрана */
+    height: 100;
     justify-content: center;
     z-index: 1000; 
   }

@@ -65,7 +65,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Поисковая строка */}
       <div className={`search-bar ${isSearchOpen ? "active" : ""}`} style={{ top: isSearchOpen ? "0" : "-100px" }}>
         <input
           type="text"
@@ -79,7 +78,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Результаты поиска */}
       {error && <p className="error-message">{error}</p>}
       {searchResults && (
         <div className="search-results">
