@@ -30,4 +30,5 @@ jobs:
         pwd
         cd Backend
         cp .env.example .env
+        ls -a
         pytest -s --cov --cov-report html --cov-fail-under 100
