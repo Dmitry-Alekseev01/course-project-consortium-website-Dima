@@ -66,4 +66,5 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI= 'sqlite:///:memory:'
     BASIC_AUTH_USERNAME = 'admin'
     BASIC_AUTH_PASSWORD = 'password'
+    TESTING = True
     #WTF_CSRF_ENABLED = False  # Отключаем CSRF для тестов
