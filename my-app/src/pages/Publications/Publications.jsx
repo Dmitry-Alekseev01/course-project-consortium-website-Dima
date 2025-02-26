@@ -17,7 +17,7 @@ const Publications = () => {
     <div className="page">
       <Navbar />
       <h1>Публикации</h1>
-      <div className="s-list">
+      <div className="projects-list">
         {publications.map((publication) => (
           <div key={publication.id} className="project">
             <h2>{publication.title}</h2>
