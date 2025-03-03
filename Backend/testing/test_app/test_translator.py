@@ -26,3 +26,11 @@ def test_translate_to_english_error():
     result = translate_to_english("Ошибка", mock_translator)
     assert result == "Ошибка"
     mock_translator.translate.assert_called_once_with("Ошибка")
+
+def test_translate_to_english_mymemory_warning():
+    mock_translator = MagicMock()
+    mock_translator.translate.return_value = "MYMEMORY WARNING"
+
+    result = translate_to_english("Текст", mock_translator)
+    assert result == "Текст"
+    mock_translator.translate.assert_called_once_with("Текст") 
