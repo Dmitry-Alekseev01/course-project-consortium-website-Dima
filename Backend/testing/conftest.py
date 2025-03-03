@@ -463,7 +463,13 @@ def mock_contact_data():
         "message": "This is a test message"
     }
 
-
+#МОК ДЛЯ ПЕРЕВОДА
+@fixture(autouse=True)
+def auto_mock_translator(monkeypatch):
+    def mock_translate(text, translator=None):
+        return f"{text}_en"
+    
+    monkeypatch.setattr("app.models.translate_to_english", mock_translate)
 
 # @fixture
 # def mock_mail(app_testing):

@@ -278,11 +278,7 @@ class TranslateMixin:
             if attribute_from and not attribute_to:
                 translated_value = translate_to_english(attribute_from) or attribute_from
                 setattr(self, translation_to, translated_value)
-        # if self.title and not self.title_en:
-        #     self.title_en = translate_to_english(self.title) or self.title
         
-        # if self.description and not self.description_en:
-        #     self.description_en = translate_to_english(self.description) or self.description
         
 
 
@@ -345,14 +341,6 @@ class Event(TranslateMixin, db.Model):
         ('description', 'description_en')
     )
 
-    # def __init__(self, **kwargs):
-    #     super(Event, self).__init__(**kwargs)
-        
-    #     if self.title and not self.title_en:
-    #         self.title_en = translate_to_english(self.title) or self.title
-        
-    #     if self.description and not self.description_en:
-    #         self.description_en = translate_to_english(self.description) or self.description
 
 # Модель для новостей
 class News(TranslateMixin, db.Model):
