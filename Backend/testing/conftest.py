@@ -256,6 +256,30 @@ def sample_news(sample_author_with_middle_name, sample_author_without_middle_nam
 
 
 @fixture
+def sample_news_with_spaces(sample_author_with_middle_name, sample_magazine):
+    return News(
+        id=1,
+        title="Test News Title",
+        publication_date=date(2023, 10, 1),
+        description="Description with spaces",
+        magazine=sample_magazine,
+        content="Content of the news",
+    )
+
+@fixture
+def sample_project_with_spaces(sample_author_with_middle_name, sample_magazine):
+    project = Project(
+        id=1,
+        title="Test Project Title",
+        publication_date=date(2023, 9, 1),
+        description="Описание проекта 1",
+        content="Контент проекта 1",
+        materials="loqiemean-как-у-людеи.mp3",
+    )
+    project.authors.extend([sample_author_with_middle_name])
+    return project
+
+@fixture
 def sample_event():
     return Event(
         id=1,
@@ -317,6 +341,13 @@ def app_testing():
 @fixture
 def client(app_testing):
     return app_testing.test_client()
+
+@fixture
+def admin_client(client):
+    """Клиент с авторизацией для тестирования админки"""
+    credentials = base64.b64encode(b"admin:password").decode()
+    client.environ_base['HTTP_AUTHORIZATION'] = f'Basic {credentials}'
+    return client
 
 
 @fixture

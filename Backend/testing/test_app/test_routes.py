@@ -236,6 +236,24 @@ class TestMagazineRoutes:
         assert response.status_code == 404
         data = response.get_json()
         assert data['error'] == 'магазин не найден'
+    
+    def test_search_with_spaces(self, client, sample_news_with_spaces, sample_project_with_spaces):
+        # Добавляем новость в БД
+        db.session.add(sample_news_with_spaces)
+        db.session.add(sample_project_with_spaces)
+        db.session.commit()
+
+        # Выполняем поиск с запросом, содержащим пробелы
+        response = client.get('/api/search?q=Test Title')
+        assert response.status_code == 200
+        data = response.json
+
+        # Проверяем результаты поиска
+        assert len(data['news']) == 1
+        assert data['news'][0]['title'] == "Test News Title"
+
+        assert len(data['projects']) == 1
+        assert data['projects'][0]['title'] == "Test Project Title"
 
 class TestSearchRoutes:
     def test_search_all_types(self, client, sample_news, sample_publication, sample_event, sample_project, sample_organisation):

@@ -10,6 +10,7 @@ from . import serializers
 import logging
 from datetime import datetime
 from enum import Enum, auto
+from sqlalchemy import or_
 main = Blueprint('main', __name__)
 
 UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
@@ -467,12 +468,6 @@ def get_authors():
 
 
 def get_and_sort_results(model, filters, sort_key=None, reverse=False):
-    # if filters:
-    #     # print(filters) # ТУТ ПАДАЕТ
-    #     # print("ТУТ ПАДАЕТ")
-    #     results = db.session.scalars(sa_select(model).filter(*filters)).all()
-    # else:
-    #     results = db.session.scalars(sa_select(model)).all()
     results = db.session.scalars(sa_select(model).filter(*filters)).all()
     if sort_key:
         results = sorted(results, key=lambda x: getattr(x, sort_key), reverse=reverse)
@@ -493,48 +488,129 @@ def get_sort_params(sort_type):
     }
     return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
 
-def build_filters(search_pattern, authors, magazines, date_from, date_to):
-    """
-    Формирует словарь базовых фильтров для каждой категории поиска.
-    Добавляет дополнительные фильтры (авторы, журналы, диапазон дат) только если они заданы.
-    """
+# def build_filters(search_pattern, authors, magazines, date_from, date_to):
+#     """
+#     Формирует словарь базовых фильтров для каждой категории поиска.
+#     Добавляет дополнительные фильтры (авторы, журналы, диапазон дат) только если они заданы.
+#     """
+#     filters = {
+#         "news": [
+#             (News.title.ilike(search_pattern)) |
+#             (News.description.ilike(search_pattern)) |
+#             (News.content.ilike(search_pattern))
+#         ],
+#         "publications": [
+#             (Publications.title.ilike(search_pattern)) |
+#             (Publications.annotation.ilike(search_pattern))
+#         ],
+#         "events": [
+#             (Event.description.ilike(search_pattern)) |
+#             (Event.location.ilike(search_pattern)) |
+#             (Event.title.ilike(search_pattern))
+#         ],
+#         "projects": [
+#             (Project.description.ilike(search_pattern)) |
+#             (Project.content.ilike(search_pattern)) |
+#             (Project.title.ilike(search_pattern))
+#         ],
+#         "organisations": [
+#             Organisation.link.ilike(search_pattern)
+#         ]
+#     }
+
+#     # Добавляем фильтр по авторам, если они заданы
+#     if authors:
+#         filters["news"].append(News.authors.any(Author.id.in_(authors)))
+#         filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
+#         filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
+
+#     # Фильтр по журналам
+#     if magazines:
+#         filters["news"].append(News.magazine_id.in_(magazines))
+#         filters["publications"].append(Publications.magazine_id.in_(magazines))
+
+#     # Фильтр по диапазону дат
+#     if date_from and date_to:
+#         filters["news"].append(News.publication_date.between(date_from, date_to))
+#         filters["publications"].append(Publications.publication_date.between(date_from, date_to))
+#         filters["events"].append(Event.publication_date.between(date_from, date_to))
+#         filters["projects"].append(Project.publication_date.between(date_from, date_to))
+
+#     return filters
+
+
+def build_filters(query, authors, magazines, date_from, date_to):
+    words = query.strip().split()
     filters = {
-        "news": [
-            (News.title.ilike(search_pattern)) |
-            (News.description.ilike(search_pattern)) |
-            (News.content.ilike(search_pattern))
-        ],
-        "publications": [
-            (Publications.title.ilike(search_pattern)) |
-            (Publications.annotation.ilike(search_pattern))
-        ],
-        "events": [
-            (Event.description.ilike(search_pattern)) |
-            (Event.location.ilike(search_pattern)) |
-            (Event.title.ilike(search_pattern))
-        ],
-        "projects": [
-            (Project.description.ilike(search_pattern)) |
-            (Project.content.ilike(search_pattern)) |
-            (Project.title.ilike(search_pattern))
-        ],
-        "organisations": [
-            Organisation.link.ilike(search_pattern)
-        ]
+        "news": [],
+        "publications": [],
+        "events": [],
+        "projects": [],
+        "organisations": [],
     }
 
-    # Добавляем фильтр по авторам, если они заданы
+    # Условия для каждого слова
+    for word in words:
+        word_pattern = f"%{word}%"
+        
+        # Новости
+        filters["news"].append(
+            or_(
+                News.title.ilike(word_pattern),
+                News.description.ilike(word_pattern),
+                News.content.ilike(word_pattern)
+            )
+        )
+        
+        # Публикации
+        filters["publications"].append(
+            or_(
+                Publications.title.ilike(word_pattern),
+                Publications.annotation.ilike(word_pattern)
+            )
+        )
+        
+        # События
+        filters["events"].append(
+            or_(
+                Event.description.ilike(word_pattern),
+                Event.location.ilike(word_pattern),
+                Event.title.ilike(word_pattern)
+            )
+        )
+        
+        # Проекты
+        filters["projects"].append(
+            or_(
+                Project.description.ilike(word_pattern),
+                Project.content.ilike(word_pattern),
+                Project.title.ilike(word_pattern)
+            )
+        )
+        
+        # Организации
+        filters["organisations"].append(
+            Organisation.link.ilike(word_pattern)
+        )
+
+    # Объединяем условия для слов через OR внутри каждой категории
+    for category in filters:
+        if filters[category]:
+            combined_condition = or_(*filters[category])
+            filters[category] = [combined_condition]
+        else:
+            filters[category] = []
+
+    # Добавление фильтров по авторам, журналам и датам
     if authors:
         filters["news"].append(News.authors.any(Author.id.in_(authors)))
         filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
         filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
 
-    # Фильтр по журналам
     if magazines:
         filters["news"].append(News.magazine_id.in_(magazines))
         filters["publications"].append(Publications.magazine_id.in_(magazines))
 
-    # Фильтр по диапазону дат
     if date_from and date_to:
         filters["news"].append(News.publication_date.between(date_from, date_to))
         filters["publications"].append(Publications.publication_date.between(date_from, date_to))
@@ -565,7 +641,7 @@ def search():
     sort_params = get_sort_params(sort_type)
     sort_key = sort_params["sort_key"]
     reverse = sort_params["reverse"]
-    search_pattern = f"%{query}%"
+    search_pattern = query #f"%{query}%"
 
     # Получаем базовые фильтры через отдельную функцию
     base_filters = build_filters(search_pattern, authors, magazines, date_from, date_to)
