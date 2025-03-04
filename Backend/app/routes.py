@@ -540,7 +540,7 @@ def get_sort_params(sort_type):
 
 
 def build_filters(query, authors, magazines, date_from, date_to):
-    words = query.strip().split()
+    words = query.strip()#.split()
     filters = {
         "news": [],
         "publications": [],
@@ -549,49 +549,90 @@ def build_filters(query, authors, magazines, date_from, date_to):
         "organisations": [],
     }
 
+    word_pattern = f"%{words}%"
+        
+    filters["news"].append(
+        or_(
+            News.title.ilike(word_pattern),
+            News.description.ilike(word_pattern),
+            News.content.ilike(word_pattern)
+        )
+    )
+    
+    # Публикации
+    filters["publications"].append(
+        or_(
+            Publications.title.ilike(word_pattern),
+            Publications.annotation.ilike(word_pattern)
+        )
+    )
+    
+    # События
+    filters["events"].append(
+        or_(
+            Event.description.ilike(word_pattern),
+            Event.location.ilike(word_pattern),
+            Event.title.ilike(word_pattern)
+        )
+    )
+    
+    # Проекты
+    filters["projects"].append(
+        or_(
+            Project.description.ilike(word_pattern),
+            Project.content.ilike(word_pattern),
+            Project.title.ilike(word_pattern)
+        )
+    )
+    
+    # Организации
+    filters["organisations"].append(
+        Organisation.link.ilike(word_pattern)
+    )
+
     # Условия для каждого слова
-    for word in words:
-        word_pattern = f"%{word}%"
+    # for word in words:
+    #     word_pattern = f"%{word}%"
         
-        # Новости
-        filters["news"].append(
-            or_(
-                News.title.ilike(word_pattern),
-                News.description.ilike(word_pattern),
-                News.content.ilike(word_pattern)
-            )
-        )
+    #     # Новости
+    #     filters["news"].append(
+    #         or_(
+    #             News.title.ilike(word_pattern),
+    #             News.description.ilike(word_pattern),
+    #             News.content.ilike(word_pattern)
+    #         )
+    #     )
         
-        # Публикации
-        filters["publications"].append(
-            or_(
-                Publications.title.ilike(word_pattern),
-                Publications.annotation.ilike(word_pattern)
-            )
-        )
+    #     # Публикации
+    #     filters["publications"].append(
+    #         or_(
+    #             Publications.title.ilike(word_pattern),
+    #             Publications.annotation.ilike(word_pattern)
+    #         )
+    #     )
         
-        # События
-        filters["events"].append(
-            or_(
-                Event.description.ilike(word_pattern),
-                Event.location.ilike(word_pattern),
-                Event.title.ilike(word_pattern)
-            )
-        )
+    #     # События
+    #     filters["events"].append(
+    #         or_(
+    #             Event.description.ilike(word_pattern),
+    #             Event.location.ilike(word_pattern),
+    #             Event.title.ilike(word_pattern)
+    #         )
+    #     )
         
-        # Проекты
-        filters["projects"].append(
-            or_(
-                Project.description.ilike(word_pattern),
-                Project.content.ilike(word_pattern),
-                Project.title.ilike(word_pattern)
-            )
-        )
+    #     # Проекты
+    #     filters["projects"].append(
+    #         or_(
+    #             Project.description.ilike(word_pattern),
+    #             Project.content.ilike(word_pattern),
+    #             Project.title.ilike(word_pattern)
+    #         )
+    #     )
         
-        # Организации
-        filters["organisations"].append(
-            Organisation.link.ilike(word_pattern)
-        )
+    #     # Организации
+    #     filters["organisations"].append(
+    #         Organisation.link.ilike(word_pattern)
+    #     )
 
     # Объединяем условия для слов через OR внутри каждой категории
     for category in filters:
