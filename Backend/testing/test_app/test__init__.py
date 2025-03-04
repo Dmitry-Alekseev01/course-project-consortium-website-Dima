@@ -1,6 +1,17 @@
 import pytest
 import base64
 from flask import url_for
+from app.models import (
+    Organisation,
+    Contact,
+    Event,
+    News,
+    Project,
+    Publications,
+    Author,
+    Magazine,
+    db
+)
 
 class TestMyAdminIndexView:
     
@@ -84,3 +95,42 @@ class TestMyModelView:
             
             response = self.client.get(endpoint, headers=self.invalid_headers)
             assert response.status_code == 401
+    
+    # def test_admin_create_event(admin_client):
+    #     """Тест создания события через админку"""
+    #     data = {
+    #         'title': 'Новое событие',
+    #         'description': 'Описание события',
+    #         'publication_date': '2023-01-01',
+    #         'location': 'Москва'
+    #     }
+    
+    #     response = admin_client.post(
+    #         '/admin/unique_event_admin/new/',
+    #         data=data,
+    #         follow_redirects=True
+    #     )
+    
+    #     assert response.status_code == 200
+    #     event = Event.query.first()
+    #     assert event.title_en == "Новое событие_en"
+    #     assert event.description_en == "Описание события_en"
+
+    # def test_admin_update_news(admin_client, route_news):
+    #     """Тест обновления новости через админку"""
+    #     updated_data = {
+    #         'title': 'Обновлённый заголовок',
+    #         'description': 'Новое описание',
+    #         'publication_date': '2023-01-01',
+    #         'content': 'Новый контент'
+    #     }
+        
+    #     response = admin_client.post(
+    #         f'/admin/unique_news_admin/edit/?id={route_news.id}',
+    #         data=updated_data,
+    #         follow_redirects=True
+    #     )
+        
+    #     updated_news = News.query.get(route_news.id)
+    #     assert updated_news.title_en == "Обновлённый заголовок_en"
+    #     assert updated_news.description_en == "Новое описание_en"
