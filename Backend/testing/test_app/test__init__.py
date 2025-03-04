@@ -14,7 +14,6 @@ from app.models import (
 )
 
 class TestMyAdminIndexView:
-    
     @pytest.fixture(autouse=True)
     def setup(self, client):
         self.client = client
@@ -96,41 +95,23 @@ class TestMyModelView:
             response = self.client.get(endpoint, headers=self.invalid_headers)
             assert response.status_code == 401
     
-    # def test_admin_create_event(admin_client):
-    #     """Тест создания события через админку"""
-    #     data = {
-    #         'title': 'Новое событие',
-    #         'description': 'Описание события',
-    #         'publication_date': '2023-01-01',
-    #         'location': 'Москва'
-    #     }
-    
-    #     response = admin_client.post(
-    #         '/admin/unique_event_admin/new/',
-    #         data=data,
-    #         follow_redirects=True
-    #     )
-    
-    #     assert response.status_code == 200
-    #     event = Event.query.first()
-    #     assert event.title_en == "Новое событие_en"
-    #     assert event.description_en == "Описание события_en"
 
-    # def test_admin_update_news(admin_client, route_news):
-    #     """Тест обновления новости через админку"""
-    #     updated_data = {
-    #         'title': 'Обновлённый заголовок',
-    #         'description': 'Новое описание',
-    #         'publication_date': '2023-01-01',
-    #         'content': 'Новый контент'
-    #     }
-        
-    #     response = admin_client.post(
-    #         f'/admin/unique_news_admin/edit/?id={route_news.id}',
-    #         data=updated_data,
-    #         follow_redirects=True
-    #     )
-        
-    #     updated_news = News.query.get(route_news.id)
-    #     assert updated_news.title_en == "Обновлённый заголовок_en"
-    #     assert updated_news.description_en == "Новое описание_en"
+
+class TestMyModelView:
+    def test_on_model_change_translation(self, news_view, sample_news):
+        sample_news.title = "Новость 1"
+        sample_news.description = "Описание новости 1"
+
+        news_view.on_model_change(None, sample_news, is_created=True)
+
+        assert sample_news.title_en == "Новость 1_en"
+        assert sample_news.description_en == "Описание новости 1_en"
+
+    def test_on_model_change_event(self, event_view, sample_event):
+        sample_event.title = "Событие 1"
+        sample_event.description = "Описание события 1"
+
+        event_view.on_model_change(None, sample_event, is_created=True)
+
+        assert sample_event.title_en == "Событие 1_en"
+        assert sample_event.description_en == "Описание события 1_en"

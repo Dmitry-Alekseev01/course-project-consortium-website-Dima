@@ -212,7 +212,7 @@ from app.models import (
     Contact,
     db,
 )
-from app import create_app
+from app import MyModelView, create_app
 
 
 @fixture
@@ -254,30 +254,15 @@ def sample_news(sample_author_with_middle_name, sample_author_without_middle_nam
     news.authors.extend([sample_author_with_middle_name, sample_author_without_middle_name])
     return news
 
+@fixture
+def news_view():
+    """Создаем экземпляр MyModelView для модели News."""
+    return MyModelView(News, db.session)
 
 @fixture
-def sample_news_with_spaces(sample_author_with_middle_name, sample_magazine):
-    return News(
-        id=1,
-        title="Test News Title",
-        publication_date=date(2023, 10, 1),
-        description="Description with spaces",
-        magazine=sample_magazine,
-        content="Content of the news",
-    )
-
-@fixture
-def sample_project_with_spaces(sample_author_with_middle_name, sample_magazine):
-    project = Project(
-        id=1,
-        title="Test Project Title",
-        publication_date=date(2023, 9, 1),
-        description="Описание проекта 1",
-        content="Контент проекта 1",
-        materials="loqiemean-как-у-людеи.mp3",
-    )
-    project.authors.extend([sample_author_with_middle_name])
-    return project
+def event_view():
+    """Создаем экземпляр MyModelView для модели Event."""
+    return MyModelView(Event, db.session)
 
 @fixture
 def sample_event():
@@ -342,12 +327,12 @@ def app_testing():
 def client(app_testing):
     return app_testing.test_client()
 
-@fixture
-def admin_client(client):
-    """Клиент с авторизацией для тестирования админки"""
-    credentials = base64.b64encode(b"admin:password").decode()
-    client.environ_base['HTTP_AUTHORIZATION'] = f'Basic {credentials}'
-    return client
+# @fixture
+# def admin_client(client):
+#     """Клиент с авторизацией для тестирования админки"""
+#     credentials = base64.b64encode(b"admin:password").decode()
+#     client.environ_base['HTTP_AUTHORIZATION'] = f'Basic {credentials}'
+#     return client
 
 
 @fixture
@@ -500,7 +485,9 @@ def auto_mock_translator(monkeypatch):
     def mock_translate(text, translator=None):
         return f"{text}_en"
     
-    monkeypatch.setattr("app.models.translate_to_english", mock_translate)
+    #monkeypatch.setattr("app.models.translate_to_english", mock_translate)
+    monkeypatch.setattr("app.translator.translate_to_english", mock_translate)
+    yield
 
 # @fixture
 # def mock_mail(app_testing):

@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 # Backend/testing/test_app/test_serializers.py
 from app.serializers import (
     serialize_author,
@@ -20,31 +21,36 @@ class TestAuthorSerializer:
 
 
 class TestNewsSerializer:
-    def test_serialize_news_with_magazine(self, sample_news):
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_news_with_magazine(self, mock_get_current_language, sample_news):
         result = serialize_news(sample_news)
         
         assert result["authors"] == ["Иванов И.И.", "Петров П."]
         assert result["materials"] == "/uploads/kitchen.jpg"
-
-    def test_serialize_news_without_magazine(self, sample_news):
+        
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_news_without_magazine(self, mock_get_current_language, sample_news):
         sample_news.magazine = None
         result = serialize_news(sample_news)
         assert result["magazine"] is None
 
 
 class TestEventSerializer:
-    def test_serialize_event_time_format(self, sample_event):
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_event_time_format(self, mock_get_current_language, sample_event):
         result = serialize_events(sample_event)
         assert result["publication_date"] == datetime.date(2023, 10, 1)
 
 
 class TestProjectSerializer:
-    def test_serialize_project_materials(self, sample_project):
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_project_materials(self, mock_get_current_language, sample_project):
         result = serialize_projects(sample_project)
         assert result["materials"] == "/uploads/loqiemean-как-у-людеи.mp3"
 
 class TestPublicationSerializer:
-    def test_serialize_publication_authors(self, sample_publication):
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_publication_authors(self, mock_get_current_language, sample_publication):
         result = serialize_publications(sample_publication)
         assert set(result["authors"]) == {"Иванов И.И.", "Петров П."}
 
