@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
+import LanguageButton from "../../components/ChangeLanguageButton/ChangeLanguageButton";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -20,7 +21,7 @@ const Navbar = () => {
 
   // Обработчик изменения ввода
   const handleSearchChange = async (e) => {
-    const value = e.target.value.trim();
+    const value = e.target.value;
     setSearchQuery(value);
     console.log("Изменение ввода, текущее значение:", value);
 
@@ -114,6 +115,7 @@ const Navbar = () => {
           <div className="search-icon" onClick={toggleSearch}>
             <img src="/loopa.png" alt="Поиск" />
           </div>
+          <div> <LanguageButton/> </div>
         </div>
       </nav>
     </>
