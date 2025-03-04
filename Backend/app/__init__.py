@@ -8,6 +8,7 @@ from flask_basicauth import BasicAuth
 from flask import Response, redirect, Flask
 from flask_admin import AdminIndexView, Admin
 from flask_admin.contrib.sqla import ModelView
+from .translator import translate_to_english
 from werkzeug.exceptions import HTTPException
 # from .cache import cache
 
@@ -34,6 +35,22 @@ class MyModelView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         print("inaccesible_callback_model")
         return basic_auth.challenge()
+    
+    def get_form_excluded_columns(self):
+        # Динамически получаем список полей для исключения
+        excluded = super().get_form_excluded_columns()
+        if hasattr(self.model, 'translations'):
+            # Добавляем все англоязычные поля из translations
+            excluded.extend([to_field for _, to_field in self.model.translations])
+        return excluded
+
+    def on_model_change(self, form, model, is_created):
+        if hasattr(model, 'translations'):
+            for from_field, to_field in model.translations:
+                if getattr(model, from_field) and not getattr(model, to_field):
+                    translated = translate_to_english(getattr(model, from_field))
+                    setattr(model, to_field, translated or getattr(model, from_field))
+        return super().on_model_change(form, model, is_created)
     
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
