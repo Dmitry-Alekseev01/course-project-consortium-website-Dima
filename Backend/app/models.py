@@ -263,21 +263,40 @@ from datetime import datetime, time, date
 from .translator import translate_to_english
 
 db = SQLAlchemy()
-class TranslateMixin:
-    # translations = (
-    #     ('title', 'title_en'),
-    #     ('description', 'description_en')
-    # )
-    translations = ()
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+# class TranslateMixin:
+    
+#     translations = ()
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
         
-        for translation_from, translation_to in self.translations:
-            attribute_from = getattr(self, translation_from)
-            attribute_to = getattr(self, translation_to)
-            if attribute_from and not attribute_to:
-                translated_value = translate_to_english(attribute_from) or attribute_from
-                setattr(self, translation_to, translated_value)
+#         for translation_from, translation_to in self.translations:
+#             attribute_from = getattr(self, translation_from)
+#             attribute_to = getattr(self, translation_to)
+#             if attribute_from and not attribute_to:
+#                 translated_value = translate_to_english(attribute_from) or attribute_from
+#                 setattr(self, translation_to, translated_value)
+
+
+class TranslateMixin:
+    translations = ()
+    
+    @classmethod
+    def __declare_last__(cls):
+        """Регистрация обработчиков событий после объявления модели"""
+        from sqlalchemy import event
+
+        def translate_fields(mapper, connection, target):
+            for from_field, to_field in target.translations:
+                source_value = getattr(target, from_field)
+                target_value = getattr(target, to_field)
+                
+                if source_value and not target_value:
+                    translated = translate_to_english(source_value)
+                    setattr(target, to_field, translated or source_value)
+
+        # Обработчики для вставки и обновления
+        event.listen(cls, 'before_insert', translate_fields)
+        event.listen(cls, 'before_update', translate_fields)
         
         
 
@@ -327,7 +346,7 @@ class Contact(db.Model):
 class Event(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    title_en = db.Column(db.String(100), nullable=False)
+    title_en = db.Column(db.String(100), nullable=True)
     # date = db.Column(db.String(50), nullable=False)
     # time = db.Column(db.DateTime, nullable=False)
     publication_date = db.Column(db.DateTime, nullable=False)
@@ -335,7 +354,7 @@ class Event(TranslateMixin, db.Model):
     #time = db.Column(db.Time, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    description_en = db.Column(db.Text, nullable=False)
+    description_en = db.Column(db.Text, nullable=True)
     translations = (
         ('title', 'title_en'),
         ('description', 'description_en')
@@ -346,11 +365,11 @@ class Event(TranslateMixin, db.Model):
 class News(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    title_en = db.Column(db.String(100), nullable=False)
+    title_en = db.Column(db.String(100), nullable=True)
     #publication_date = db.Column(db.String(50), nullable=False)
     publication_date = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    description_en = db.Column(db.Text, nullable=False)
+    description_en = db.Column(db.Text, nullable=True)
     magazine_id = db.Column(db.Integer, db.ForeignKey('magazine.id', ondelete="CASCADE"), nullable=True)
     content = db.Column(db.Text, nullable=False)
     materials = db.Column(db.String(300))  # Путь к файлу
@@ -411,11 +430,11 @@ class News(TranslateMixin, db.Model):
 class Publications(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    title_en = db.Column(db.String(100), nullable=False)
+    title_en = db.Column(db.String(100), nullable=True)
     publication_date = db.Column(db.DateTime, nullable=False)
     magazine_id = db.Column(db.Integer, db.ForeignKey('magazine.id', ondelete="CASCADE"), nullable=True)
     annotation = db.Column(db.Text, nullable=False)
-    annotation_en = db.Column(db.Text, nullable=False)
+    annotation_en = db.Column(db.Text, nullable=True)
     authors = db.relationship('Author', secondary=publication_authors, lazy='subquery',
                               backref=db.backref('publications', lazy=True), cascade="all, delete")
     translations = (
@@ -437,11 +456,11 @@ class Publications(TranslateMixin, db.Model):
 class Project(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    title_en = db.Column(db.String(100), nullable=False)
+    title_en = db.Column(db.String(100), nullable=True)
     #publication_date = db.Column(db.String(50), nullable=False)
     publication_date = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    description_en = db.Column(db.Text, nullable=False)
+    description_en = db.Column(db.Text, nullable=True)
     content = db.Column(db.Text, nullable=False)
     materials = db.Column(db.String(300))  # Путь к файлу
     authors = db.relationship('Author', secondary=project_authors, lazy='subquery',
