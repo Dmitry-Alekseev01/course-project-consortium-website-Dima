@@ -100,7 +100,8 @@ def create_app(config_path = 'app.config.Config', mail = mail):
     from .routes import main
     app.register_blueprint(main)
 
-    CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+    #CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
 
     with app.app_context():
         db.create_all()

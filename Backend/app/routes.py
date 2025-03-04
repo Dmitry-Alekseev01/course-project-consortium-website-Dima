@@ -39,20 +39,17 @@ def get_language():
 
 @main.route('/api/set_language', methods=['POST'])
 def set_language():
-    if request.method == 'OPTIONS':
-        response = jsonify({'message': 'CORS preflight'})
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST')
-        return response
-
     data = request.get_json()
     language = data.get('language')
     if language not in ['ru', 'en']:
         return jsonify({'error': 'Invalid language'}), 400
 
     session['language'] = language
-    return jsonify({'message': 'Language updated successfully'}), 200
+    response = jsonify({'message': 'Language updated successfully'})
+    # Добавляем CORS заголовки
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
