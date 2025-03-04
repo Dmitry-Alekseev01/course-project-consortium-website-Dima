@@ -41,7 +41,6 @@
 #         print(f"Translation error: {e}")
 #         return text
 
-
 from translate import Translator
 # from .cache import get_cached_translation
 
@@ -69,4 +68,4 @@ def translate_to_english(text, translator=Translator(from_lang="ru", to_lang="en
     except Exception as e:
         #print(f"Translation error: {e}")
         #print(text)
-        return "ENG" #text
+        return text #text

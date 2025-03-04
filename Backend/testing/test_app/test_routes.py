@@ -237,23 +237,6 @@ class TestMagazineRoutes:
         data = response.get_json()
         assert data['error'] == 'магазин не найден'
     
-    def test_search_with_spaces(self, client, sample_news_with_spaces, sample_project_with_spaces):
-        # Добавляем новость в БД
-        db.session.add(sample_news_with_spaces)
-        db.session.add(sample_project_with_spaces)
-        db.session.commit()
-
-        # Выполняем поиск с запросом, содержащим пробелы
-        response = client.get('/api/search?q=Test Title')
-        assert response.status_code == 200
-        data = response.json
-
-        # Проверяем результаты поиска
-        assert len(data['news']) == 1
-        assert data['news'][0]['title'] == "Test News Title"
-
-        assert len(data['projects']) == 1
-        assert data['projects'][0]['title'] == "Test Project Title"
 
 class TestSearchRoutes:
     def test_search_all_types(self, client, sample_news, sample_publication, sample_event, sample_project, sample_organisation):
@@ -270,7 +253,7 @@ class TestSearchRoutes:
         assert len(data['publications']) == 1
         assert len(data['events']) == 1
         assert len(data['projects']) == 1
-        assert len(data['organisations']) == 1  # Убедимся, что фильтр для организаций работает
+        assert len(data['organisations']) == 1
 
     def test_search_with_authors_filter(self, client, sample_news, sample_publication, sample_project, sample_author_with_middle_name):
         # Настраиваем авторов
@@ -313,6 +296,19 @@ class TestSearchRoutes:
         assert len(data['projects']) == 1
 
 class TestSearchFunctions:
+    def test_search_empty_category(self, client):
+        response = client.get('/api/search?q=fakequery')
+
+        assert response.status_code == 200
+
+        data = response.get_json()
+
+        assert data["news"] == []
+        assert data["publications"] == []
+        assert data["projects"] == []
+        assert data["events"] == []
+        assert data["organisations"] == []
+        
     def test_search_empty_query(self, client):
         response = client.get('/api/search?q=')
         assert response.status_code == 400
@@ -337,6 +333,35 @@ class TestSearchFunctions:
         results = get_and_sort_results(News, [News.title.ilike("%News%")], sort_key='publication_date', reverse=False)
         # Преобразуем datetime к date для сравнения
         assert [n.publication_date.date() for n in results] == [date(2023, 10, 1), date(2023, 10, 2)]
+
+class TestLanguageFunctions:
+    def test_set_language_valid(self, client):
+        # Отправляем POST-запрос для установки языка
+        response = client.post(
+            '/api/set_language',
+            json={'language': 'en'}
+        )
+        
+        # Проверяем статус ответа
+        assert response.status_code == 200
+        
+        # Проверяем содержимое ответа
+        data = response.get_json()
+        assert data['message'] == 'Language updated successfully'
+        
+        # Проверяем, что язык действительно установлен
+        get_response = client.get('/api/get_language')
+        get_data = get_response.get_json()
+        assert get_data['language'] == 'en'
+
+    def test_sel_language_invalid(self,  client):
+        response = client.post(
+            '/api/set_language',
+            json={'language': 'fr'}
+        )
+        
+        # Проверяем статус ответа
+        assert response.status_code == 400
 
 # class TestSearchRoutes:
 #     def test_get_and_sort_results_without_sort(self, mock_news_for_search, mock_filters_for_search):

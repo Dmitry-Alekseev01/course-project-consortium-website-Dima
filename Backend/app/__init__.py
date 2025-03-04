@@ -37,10 +37,8 @@ class MyModelView(ModelView):
         return basic_auth.challenge()
     
     def get_form_excluded_columns(self):
-        # Динамически получаем список полей для исключения
         excluded = super().get_form_excluded_columns()
         if hasattr(self.model, 'translations'):
-            # Добавляем все англоязычные поля из translations
             excluded.extend([to_field for _, to_field in self.model.translations])
         return excluded
 
