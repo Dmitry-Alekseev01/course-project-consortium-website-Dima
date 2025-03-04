@@ -62,10 +62,11 @@ def translate_to_english(text, translator=Translator(from_lang="ru", to_lang="en
         #print("Translation method")
         translated_text = translator.translate(text)
         if "MYMEMORY WARNING" in translated_text:
+            #print("i am here")
             raise Exception(translated_text)
         #print(translated_text)
         return translated_text
     except Exception as e:
         #print(f"Translation error: {e}")
         #print(text)
-        return text
+        return "ENG" #text

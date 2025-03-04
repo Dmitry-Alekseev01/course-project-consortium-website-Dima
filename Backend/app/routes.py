@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_from_directory, Response
+from flask import Blueprint, request, jsonify, send_from_directory, Response, session
 from email_validator import validate_email, EmailNotValidError
 from sqlalchemy import select as sa_select
 from werkzeug.utils import secure_filename
@@ -7,6 +7,7 @@ from .models import db, Contact, Event, Project, News, Publications, Organisatio
 from flask_mail import Message
 from . import mail
 from . import serializers
+from .utils import get_current_language
 import logging
 from datetime import datetime
 from enum import Enum, auto
@@ -32,6 +33,26 @@ def send_email(subject, sender, recipients, body):
         logging.error(f"Ошибка при отправке email: {e}")
         return False
 
+@main.route('/api/get_language', methods=['GET'])
+def get_language():
+    return jsonify({'language': session.get('language', 'ru')}), 200
+
+@main.route('/api/set_language', methods=['POST'])
+def set_language():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'CORS preflight'})
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+
+    data = request.get_json()
+    language = data.get('language')
+    if language not in ['ru', 'en']:
+        return jsonify({'error': 'Invalid language'}), 400
+
+    session['language'] = language
+    return jsonify({'message': 'Language updated successfully'}), 200
 
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
@@ -172,6 +193,8 @@ def get_magazine_by_id(magazine_id):
         return jsonify({'id': magazine.id, 'name': magazine.name}), 200
     else:
         return jsonify({'error': 'магазин не найден'}), 404
+    
+
 
 # Маршрут для получения всех журналов
 @main.route('/api/magazines', methods=['GET'])

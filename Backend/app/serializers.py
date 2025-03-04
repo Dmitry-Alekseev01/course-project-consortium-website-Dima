@@ -11,11 +11,11 @@ def get_initials(author : Author):
 def serialize_news(news : News):
     return {
             'id': news.id,
-            'title': news.title,
+            'title': news.title_display,
             'authors': [serialize_author(author) 
                         for author in news.authors],
             'publication_date': news.publication_date,
-            'description': news.description,
+            'description': news.description_display,
             'magazine': news.magazine.name if news.magazine else None,
             'content': news.content,
             'materials': f"/uploads/{news.materials}" 
@@ -23,35 +23,35 @@ def serialize_news(news : News):
 def serialize_events(event : Event):
     return {
             'id': event.id,
-            'title': event.title,
+            'title': event.title_display,
             # 'date': event.date.isoformat() if isinstance(event.date, date) else event.date,
             # 'time': event.time.strftime("%H:%M") if isinstance(event.time, time) else event.time,
             'publication_date': event.publication_date,
             # 'date': event.date,
             # 'time': event.time,
             'location': event.location,
-            'description': event.description
+            'description': event.description_display
         }
 def serialize_projects(project : Project):
     return {
             'id': project.id,
-            'title': project.title,
+            'title': project.title_display,
             'authors': [serialize_author(author) 
                         for author in project.authors],
             'publication_date': project.publication_date,
-            'description': project.description,
+            'description': project.description_display,
             'content': project.content,
             'materials': f"/uploads/{project.materials}"
         }
 def serialize_publications(publication : Publications):
     return {
             'id': publication.id,
-            'title': publication.title,
+            'title': publication.title_display,
             'authors': [serialize_author(author) 
                         for author in publication.authors],
             'publication_date': publication.publication_date,
             'magazine': publication.magazine.name if publication.magazine else None,
-            'annotation': publication.annotation
+            'annotation': publication.annotation_display
         }
 def serialize_organisations(organisation : Organisation):
     return {

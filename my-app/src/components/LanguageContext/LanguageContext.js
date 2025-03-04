@@ -14,7 +14,7 @@ export const LanguageProvider = ({ children }) => {
   const toggleLanguage = async () => {
     const newLang = language === 'ru' ? 'en' : 'ru';
     try {
-      await axios.post('/set_language', { language: newLang });
+      await axios.post('http://127.0.0.1:5000/api/set_language', { language: newLang });
       setLanguage(newLang);
       localStorage.setItem('language', newLang);
     } catch (error) {
