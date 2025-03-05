@@ -99,8 +99,6 @@ class TestMyModelView:
 
 class TestMyModelView:
     def test_on_model_change_translation(self, news_view, sample_news):
-        sample_news.title = "Новость 1"
-        sample_news.description = "Описание новости 1"
 
         news_view.on_model_change(None, sample_news, is_created=True)
 
@@ -108,8 +106,6 @@ class TestMyModelView:
         assert sample_news.description_en == "Описание новости 1_en"
 
     def test_on_model_change_event(self, event_view, sample_event):
-        sample_event.title = "Событие 1"
-        sample_event.description = "Описание события 1"
 
         event_view.on_model_change(None, sample_event, is_created=True)
 

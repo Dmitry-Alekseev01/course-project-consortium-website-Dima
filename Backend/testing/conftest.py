@@ -487,7 +487,7 @@ def auto_mock_translator(monkeypatch):
     
     #monkeypatch.setattr("app.models.translate_to_english", mock_translate)
     monkeypatch.setattr("app.translator.translate_to_english", mock_translate)
-    yield
+    #yield
 
 # @fixture
 # def mock_mail(app_testing):

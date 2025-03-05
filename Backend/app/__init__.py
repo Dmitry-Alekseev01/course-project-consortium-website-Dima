@@ -76,7 +76,7 @@ def register_admin_views(admin: Admin, db):
 def create_app(config_path = 'app.config.Config', mail = mail):
     app = Flask(__name__)
     app.config.from_object(config_path)
-    app.config['DEBUG'] = True
+    #app.config['DEBUG'] = True
 
 
     basic_auth.init_app(app)
@@ -99,9 +99,10 @@ def create_app(config_path = 'app.config.Config', mail = mail):
     app.register_blueprint(main)
 
     #CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
-    CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost",  "http://localhost:5000", "http://localhost:8080"])
 
     with app.app_context():
         db.create_all()
 
+    print("CREATE APP")
     return app
