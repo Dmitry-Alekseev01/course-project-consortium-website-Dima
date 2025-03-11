@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const MapSection = () => {
-  // Состояния для управления параметрами
   const [fullScreen, setFullScreen] = useState(true); 
   const [fullWidth, setFullWidth] = useState(false);
   const [paddingTop, setPaddingTop] = useState(5);
@@ -16,7 +15,6 @@ const MapSection = () => {
   const [overlayColor, setOverlayColor] = useState('#ffffff');
   const [overlayOpacity, setOverlayOpacity] = useState(0.8);
 
-  // Стили для секции
   const sectionStyle = {
     border: `1px solid ${borderColor}`,
     paddingTop: `${paddingTop}rem`,
@@ -29,7 +27,6 @@ const MapSection = () => {
     justifyContent: 'center'
   };
 
-  // Стили для оверлея
   const overlayStyle = {
     backgroundColor: overlayColor,
     opacity: overlayOpacity,

@@ -49,7 +49,7 @@ const NewsDetails = () => {
         <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
         <p><strong>Дата публикации:</strong> {news.publication_date}</p>
         <p><strong>Описание:</strong> {news.description}</p>
-        <p><strong>Журнал:</strong> {news.magazine || "Не указан"}</p>
+        <p><strong>Журнал:</strong> {news.magazine.name || "Не указан"}</p>
         <p><strong>Текст:</strong> {news.content}</p>
         {news.materials && (
           <p>

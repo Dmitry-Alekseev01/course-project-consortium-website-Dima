@@ -6,7 +6,6 @@ const JournalFilter = ({ onApply }) => {
   const [selectedAuthors, setSelectedMagazines] = useState([]);
   const [magazines, setMagazines] = useState([]);
 
-  // Загрузка авторов с бэкенда
   useEffect(() => {
     fetch('http://127.0.0.1:5000/api/magazines')
       .then(res => res.json())
@@ -38,7 +37,6 @@ const JournalFilter = ({ onApply }) => {
               <span className="author-name">
                 {magazine.name} {magazine.news} {magazine.publications}
               </span>
-              {/* <span className="count">{magazine.news_count}</span> */}
             </label>
           ))}
           

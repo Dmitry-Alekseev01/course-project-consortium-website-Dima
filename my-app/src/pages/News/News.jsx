@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import { Link } from "react-router-dom";
 
 
 const News = () => {
+  const { language } = useContext(LanguageContext);
   const [news, setNews] = useState([]);
 
   useEffect(() => {
@@ -14,7 +16,14 @@ const News = () => {
       .catch((error) => console.error('Ошибка при загрузке новостей:', error));
   }, []);
 
-  // Функция для определения типа файла
+  const formatAuthors = (authors) => {
+    return authors.map(author => {
+      const firstName = author[`first_name_${language}`] || author.first_name;
+      const lastName = author[`last_name_${language}`] || author.last_name;
+      return `${firstName} ${lastName}`;
+    }).join(', ');
+  };
+
   const getFileType = (fileName) => {
     const extension = fileName.split(".").pop().toLowerCase();
     if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
@@ -28,7 +37,6 @@ const News = () => {
     }
   };
 
-  // Функция для отображения файла в зависимости от его типа
   const renderFile = (fileUrl) => {
     const fileType = getFileType(fileUrl);
 
@@ -60,15 +68,30 @@ const News = () => {
   return (
     <div className="page">
       <Navbar />
-      <h1>Новости</h1>
+      <h1>{language === 'ru' ? 'Новости' : 'News'}</h1>
       <div className="projects-list">
         {news.map((news) => (
           <div key={news.id} className="project">
-            <h2>{news.title}</h2>
-            <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
-            <p><strong>Дата публикации:</strong> {news.publication_date}</p>
-            <p><strong>Описание:</strong> {news.description}</p>
-            <p><strong>Журнал:</strong> {news.magazine || "Не издавалась"}</p>
+            {/* <h2>{news.title}</h2> */}
+            <h2>{news[`title_${language}`] || news.title}</h2>
+            {/* <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
+            <p><strong>Дата публикации:</strong> {news.publication_date}</p> */}
+            <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(news.authors)}</p>
+            <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
+              {new Date(news.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
+            </p>
+            {/* <p><strong>Описание:</strong> {news.description}</p> */}
+            <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
+              {news[`description_${language}`] || news.description}
+            </p>
+            <p>
+            {news.magazine && (
+              <p><strong>{language === 'ru' ? 'Журнал: ' : 'Journal: '}</strong> 
+                {news.magazine[`name_${language}`] || news.magazine.name}
+              </p>
+            )}
+            </p>
+            {/* <p><strong>Журнал:</strong> {news.magazine.name || "Не издавалась"}</p> */}
             <p><strong>Текст:</strong> {news.content}</p>
             <p>
               <strong>Материалы:</strong>{" "}

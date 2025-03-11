@@ -57,7 +57,7 @@ export const publicRoutes = [
     Element: <Projects />,
   },
   {
-    path: EVENT_DETAIL_ROUTE, // Новый маршрут для деталей событий
+    path: EVENT_DETAIL_ROUTE,
     Element: <EventDetail />,
   },
   {

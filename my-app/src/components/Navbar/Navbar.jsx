@@ -10,7 +10,6 @@ const Navbar = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Открытие/закрытие поиска
   const toggleSearch = () => {
     console.log("Тоггл поиска. Сейчас:", isSearchOpen);
     setIsSearchOpen(!isSearchOpen);
@@ -19,7 +18,6 @@ const Navbar = () => {
     setError(null);
   };
 
-  // Обработчик изменения ввода
   const handleSearchChange = async (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -32,7 +30,6 @@ const Navbar = () => {
     }
   };
 
-  // Обработчик нажатия Enter
   const handleSearchKeyPress = async (e) => {
     if (e.key === "Enter" && searchQuery.trim().length > 2) {
       console.log("Enter нажат. Перенаправление на страницу поиска...");
@@ -40,15 +37,12 @@ const Navbar = () => {
     }
   };
 
-  // Функция поиска
   const performSearch = async (query) => {
     console.log(" Отправка запроса:", query);
 
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/search?q=${encodeURIComponent(query)}`);
-      
       console.log("Ответ от сервера (статус):", response.status);
-      
       if (!response.ok) {
         throw new Error(`Ошибка сервера: ${response.status}`);
       }
@@ -98,7 +92,6 @@ const Navbar = () => {
           )}
         </div>
       )}
-      {/* Навигация */}
       <nav className="navbar">
         <div className="navbar-container">
           <a href="/" className="navbar-logo">

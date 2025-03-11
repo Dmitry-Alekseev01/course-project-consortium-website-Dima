@@ -48,7 +48,7 @@ const PublicationDetails = () => {
         <h2>{publication.title}</h2>
         <p><strong>Авторы:</strong> {publication.authors.join(', ')}</p>
         <p><strong>Дата публикации:</strong> {publication.publication_date}</p>
-        <p><strong>Журнал:</strong> {publication.magazine || "Не указан"}</p>
+        <p><strong>Журнал:</strong> {publication.magazine.name || "Не указан"}</p>
         <p><strong>Описание:</strong> {publication.annotation}</p>
       </div>
       <Footer />

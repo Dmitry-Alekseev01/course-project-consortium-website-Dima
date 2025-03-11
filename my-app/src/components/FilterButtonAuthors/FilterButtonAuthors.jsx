@@ -6,7 +6,6 @@ const AuthorFilter = ({ onApply }) => {
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [authors, setAuthors] = useState([]);
 
-  // Загрузка авторов с бэкенда
   useEffect(() => {
     fetch('http://127.0.0.1:5000/api/authors')
       .then(res => res.json())
