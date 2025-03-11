@@ -33,23 +33,23 @@ def send_email(subject, sender, recipients, body):
         logging.error(f"Ошибка при отправке email: {e}")
         return False
 
-@main.route('/api/get_language', methods=['GET'])
-def get_language():
-    return jsonify({'language': session.get('language', 'ru')}), 200
+# @main.route('/api/get_language', methods=['GET'])
+# def get_language():
+#     return jsonify({'language': session.get('language', 'ru')}), 200
 
-@main.route('/api/set_language', methods=['POST'])
-def set_language():
-    data = request.get_json()
-    language = data.get('language')
-    if language not in ['ru', 'en']:
-        return jsonify({'error': 'Invalid language'}), 400
+# @main.route('/api/set_language', methods=['POST'])
+# def set_language():
+#     data = request.get_json()
+#     language = data.get('language')
+#     if language not in ['ru', 'en']:
+#         return jsonify({'error': 'Invalid language'}), 400
 
-    session['language'] = language
-    response = jsonify({'message': 'Language updated successfully'})
-    # Добавляем CORS заголовки
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
+#     session['language'] = language
+#     response = jsonify({'message': 'Language updated successfully'})
+#     # Добавляем CORS заголовки
+#     response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+#     response.headers.add('Access-Control-Allow-Credentials', 'true')
+#     return response
 
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
@@ -183,41 +183,97 @@ def get_organisation_by_id(organisation_id):
     else:
         return jsonify({'error': 'Организация не найдена'}), 404
 
+
+# @main.route('/api/magazines/<int:magazine_id>', methods=['GET']) 
+# def get_magazine_by_id(magazine_id):
+#     magazine = db.session.get(Magazine, magazine_id) 
+#     if magazine:
+#         return jsonify({'id': magazine.id, 'name': magazine.name}), 200
+#     else:
+#         return jsonify({'error': 'магазин не найден'}), 404
+    
+
+
+# # Маршрут для получения всех журналов
+# @main.route('/api/magazines', methods=['GET'])
+# def get_magazines():
+#     magazines = db.session.scalars(sa_select(Magazine)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
+#     magazines_list = [{'id': mag.id, 'name': mag.name} for mag in magazines]
+#     return jsonify(magazines_list), 200
+
+# @main.route('/api/authors/<int:author_id>', methods=['GET']) 
+# def get_author_by_id(author_id):
+#     author = db.session.get(Author, author_id) 
+#     if author:
+#         return {'id': author.id, 'first_name': author.first_name, 
+#                      'last_name': author.last_name, 'middle_name': author.middle_name}, 200
+#     else:
+#         return jsonify({'error': 'автор не найден'}), 404
+
+# # Маршрут для получения всех авторов
+# @main.route('/api/authors', methods=['GET'])
+# def get_authors():
+#     authors = db.session.scalars(sa_select(Author)).all() 
+#     authors_list = [{'id': author.id, 'first_name': author.first_name, 
+#                      'last_name': author.last_name, 'middle_name': author.middle_name} 
+#                     for author in authors]
+#     return jsonify(authors_list), 200
+
+
+
+
 @main.route('/api/magazines/<int:magazine_id>', methods=['GET']) 
 def get_magazine_by_id(magazine_id):
     magazine = db.session.get(Magazine, magazine_id) 
     if magazine:
-        return jsonify({'id': magazine.id, 'name': magazine.name}), 200
+        return jsonify({
+            'id': magazine.id,
+            'name': magazine.name,
+            'name_en': magazine.name_en
+        }), 200
     else:
         return jsonify({'error': 'магазин не найден'}), 404
-    
 
 
-# Маршрут для получения всех журналов
 @main.route('/api/magazines', methods=['GET'])
 def get_magazines():
-    magazines = db.session.scalars(sa_select(Magazine)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
-    magazines_list = [{'id': mag.id, 'name': mag.name} for mag in magazines]
+    magazines = db.session.scalars(sa_select(Magazine)).all()
+    magazines_list = [{
+        'id': mag.id,
+        'name': mag.name,
+        'name_en': mag.name_en
+    } for mag in magazines]
     return jsonify(magazines_list), 200
 
 @main.route('/api/authors/<int:author_id>', methods=['GET']) 
 def get_author_by_id(author_id):
     author = db.session.get(Author, author_id) 
     if author:
-        return {'id': author.id, 'first_name': author.first_name, 
-                     'last_name': author.last_name, 'middle_name': author.middle_name}, 200
+        return {
+            'id': author.id,
+            'first_name': author.first_name,
+            'first_name_en': author.first_name_en,
+            'last_name': author.last_name,
+            'last_name_en': author.last_name_en,
+            'middle_name': author.middle_name,
+            'middle_name_en': author.middle_name_en
+        }, 200
     else:
         return jsonify({'error': 'автор не найден'}), 404
 
-# Маршрут для получения всех авторов
 @main.route('/api/authors', methods=['GET'])
 def get_authors():
     authors = db.session.scalars(sa_select(Author)).all() 
-    authors_list = [{'id': author.id, 'first_name': author.first_name, 
-                     'last_name': author.last_name, 'middle_name': author.middle_name} 
-                    for author in authors]
+    authors_list = [{
+        'id': author.id,
+        'first_name': author.first_name,
+        'first_name_en': author.first_name_en,
+        'last_name': author.last_name,
+        'last_name_en': author.last_name_en,
+        'middle_name': author.middle_name,
+        'middle_name_en': author.middle_name_en
+    } for author in authors]
     return jsonify(authors_list), 200
-
 
 
 # Это старый рабочий метод НЕ УДАЛЯТЬ
