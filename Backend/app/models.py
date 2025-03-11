@@ -303,18 +303,30 @@ class TranslateMixin:
 
 
 # Таблица для журналов
-class Magazine(db.Model):
+class Magazine(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)  # Уникальное название журнала
+    name_en = db.Column(db.String(100), nullable=True, unique=True)
     news = db.relationship('News', backref='magazine', cascade="all, delete")
     publications = db.relationship('Publications', backref='magazine', cascade="all, delete")
+    translations = (
+        ('name', 'name_en'),
+    )
 
 # Таблица для авторов
-class Author(db.Model):
+class Author(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)  # Имя
+    first_name_en = db.Column(db.String(50), nullable=True)
     last_name = db.Column(db.String(50), nullable=False)   # Фамилия
+    last_name_en = db.Column(db.String(50), nullable=True)
     middle_name = db.Column(db.String(50), nullable=True)  # Отчество (может быть NULL)
+    middle_name_en = db.Column(db.String(50), nullable=True)
+    translations = (
+        ('first_name', 'first_name_en'),
+        ('last_name', 'last_name_en'),
+        ('middle_name', 'middle_name_en')
+    )
 
 # Таблица связи для новостей и авторов
 news_authors = db.Table('news_authors',
@@ -361,15 +373,15 @@ class Event(TranslateMixin, db.Model):
         ('description', 'description_en')
     )
 
-    @property
-    def title_display(self):
-        language = utils.get_current_language()
-        return self.title_en if language == 'en' else self.title
+    # @property
+    # def title_display(self):
+    #     language = utils.get_current_language()
+    #     return self.title_en if language == 'en' else self.title
 
-    @property
-    def description_display(self):
-        language = utils.get_current_language()
-        return self.description_en if language == 'en' else self.description
+    # @property
+    # def description_display(self):
+    #     language = utils.get_current_language()
+    #     return self.description_en if language == 'en' else self.description
 
 # Модель для новостей
 class News(TranslateMixin, db.Model):
@@ -390,15 +402,15 @@ class News(TranslateMixin, db.Model):
         ('description', 'description_en')
     )
     
-    @property
-    def title_display(self):
-        language = utils.get_current_language()
-        return self.title_en if language == 'en' else self.title
+    # @property
+    # def title_display(self):
+    #     language = utils.get_current_language()
+    #     return self.title_en if language == 'en' else self.title
 
-    @property
-    def description_display(self):
-        language = utils.get_current_language()
-        return self.description_en if language == 'en' else self.description
+    # @property
+    # def description_display(self):
+    #     language = utils.get_current_language()
+    #     return self.description_en if language == 'en' else self.description
     
     # def __init__(self, **kwargs):
     #     super(News, self).__init__(**kwargs)
@@ -460,15 +472,16 @@ class Publications(TranslateMixin, db.Model):
         ('annotation', 'annotation_en')
     )
 
-    @property
-    def title_display(self):
-        language = utils.get_current_language()
-        return self.title_en if language == 'en' else self.title
+    # @property
+    # def title_display(self):
+    #     language = utils.get_current_language()
+    #     return self.title_en if language == 'en' else self.title
 
-    @property
-    def annotation_display(self):
-        language = utils.get_current_language()
-        return self.annotation_en if language == 'en' else self.annotation    
+    # @property
+    # def annotation_display(self):
+    #     language = utils.get_current_language()
+    #     return self.annotation_en if language == 'en' else self.annotation   
+     
     # def __init__(self, **kwargs):
     #     super(Publications, self).__init__(**kwargs)
         
@@ -496,15 +509,16 @@ class Project(TranslateMixin, db.Model):
         ('description', 'description_en')
     )
 
-    @property
-    def title_display(self):
-        language = utils.get_current_language()
-        return self.title_en if language == 'en' else self.title
+    # @property
+    # def title_display(self):
+    #     language = utils.get_current_language()
+    #     return self.title_en if language == 'en' else self.title
 
-    @property
-    def description_display(self):
-        language = utils.get_current_language()
-        return self.description_en if language == 'en' else self.description
+    # @property
+    # def description_display(self):
+    #     language = utils.get_current_language()
+    #     return self.description_en if language == 'en' else self.description
+    
     # def __init__(self, **kwargs):
     #     super(Project, self).__init__(**kwargs)
         

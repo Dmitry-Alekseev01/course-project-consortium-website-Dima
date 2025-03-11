@@ -36,19 +36,19 @@ class MyModelView(ModelView):
         print("inaccesible_callback_model")
         return basic_auth.challenge()
     
-    def get_form_excluded_columns(self):
-        excluded = super().get_form_excluded_columns()
-        if hasattr(self.model, 'translations'):
-            excluded.extend([to_field for _, to_field in self.model.translations])
-        return excluded
+    # def get_form_excluded_columns(self):
+    #     excluded = super().get_form_excluded_columns()
+    #     if hasattr(self.model, 'translations'):
+    #         excluded.extend([to_field for _, to_field in self.model.translations])
+    #     return excluded
 
-    def on_model_change(self, form, model, is_created):
-        if hasattr(model, 'translations'):
-            for from_field, to_field in model.translations:
-                if getattr(model, from_field) and not getattr(model, to_field):
-                    translated = translate_to_english(getattr(model, from_field))
-                    setattr(model, to_field, translated or getattr(model, from_field))
-        return super().on_model_change(form, model, is_created)
+    # def on_model_change(self, form, model, is_created):
+    #     if hasattr(model, 'translations'):
+    #         for from_field, to_field in model.translations:
+    #             if getattr(model, from_field) and not getattr(model, to_field):
+    #                 translated = translate_to_english(getattr(model, from_field))
+    #                 setattr(model, to_field, translated or getattr(model, from_field))
+    #     return super().on_model_change(form, model, is_created)
     
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
