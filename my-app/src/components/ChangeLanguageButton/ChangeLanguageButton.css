@@ -1,39 +1,65 @@
-.flip-button {
-    perspective: 1000px;
-    width: 100px;
-    height: 50px;
-    cursor: pointer;
-    margin: 10px;
-    margin-left: 20px;
-  }
-  
-  .flip-button-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-  }
-  
-  .flip-button.flipped .flip-button-inner {
-    transform: rotateY(180deg);
-  }
-  
-  .flip-button-front, .flip-button-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 30px;
-    font-size: 20px;
-    background-color: #d88181;
-    color: black;
-  }
-  
-  .flip-button-back {
-    transform: rotateY(180deg);
-  }
+.language-toggle-button {
+  position: relative;
+  cursor: pointer;
+  width: 120px;
+  height: 50px;
+  margin-left: 20px;
+  perspective: 1000px;
+}
+
+.language-toggle-button-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.language-toggle-button.flipped .language-toggle-button-inner {
+  transform: rotateY(180deg);
+}
+
+.language-toggle-button-front, 
+.language-toggle-button-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.language-toggle-button-front {
+  background-color: #d88181;
+  color: white;
+}
+
+.language-toggle-button-back {
+  background-color: #d88181;
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.language-toggle-button:after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.language-toggle-button.flipped:after {
+  left: calc(100% - 45px);
+}
+
+.language-toggle-button:active:after {
+  width: 50px;
+}
