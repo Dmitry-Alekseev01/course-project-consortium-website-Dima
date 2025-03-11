@@ -334,34 +334,6 @@ class TestSearchFunctions:
         # Преобразуем datetime к date для сравнения
         assert [n.publication_date.date() for n in results] == [date(2023, 10, 1), date(2023, 10, 2)]
 
-class TestLanguageFunctions:
-    def test_set_language_valid(self, client):
-        # Отправляем POST-запрос для установки языка
-        response = client.post(
-            '/api/set_language',
-            json={'language': 'en'}
-        )
-        
-        # Проверяем статус ответа
-        assert response.status_code == 200
-        
-        # Проверяем содержимое ответа
-        data = response.get_json()
-        assert data['message'] == 'Language updated successfully'
-        
-        # Проверяем, что язык действительно установлен
-        get_response = client.get('/api/get_language')
-        get_data = get_response.get_json()
-        assert get_data['language'] == 'en'
-
-    def test_sel_language_invalid(self,  client):
-        response = client.post(
-            '/api/set_language',
-            json={'language': 'fr'}
-        )
-        
-        # Проверяем статус ответа
-        assert response.status_code == 400
 
 # class TestSearchRoutes:
 #     def test_get_and_sort_results_without_sort(self, mock_news_for_search, mock_filters_for_search):

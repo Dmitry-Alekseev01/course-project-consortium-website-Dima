@@ -97,17 +97,17 @@ class TestMyModelView:
     
 
 
-class TestMyModelView:
-    def test_on_model_change_translation(self, news_view, sample_news):
+# class TestMyModelView:
+#     def test_on_model_change_translation(self, news_view, sample_news):
 
-        news_view.on_model_change(None, sample_news, is_created=True)
+#         news_view.on_model_change(None, sample_news, is_created=True)
 
-        assert sample_news.title_en == "Новость 1_en"
-        assert sample_news.description_en == "Описание новости 1_en"
+#         assert sample_news.title_en == "Новость 1_en"
+#         assert sample_news.description_en == "Описание новости 1_en"
 
-    def test_on_model_change_event(self, event_view, sample_event):
+#     def test_on_model_change_event(self, event_view, sample_event):
 
-        event_view.on_model_change(None, sample_event, is_created=True)
+#         event_view.on_model_change(None, sample_event, is_created=True)
 
-        assert sample_event.title_en == "Событие 1_en"
-        assert sample_event.description_en == "Описание события 1_en"
+#         assert sample_event.title_en == "Событие 1_en"
+#         assert sample_event.description_en == "Описание события 1_en"

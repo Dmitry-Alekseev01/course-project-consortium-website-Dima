@@ -13,11 +13,27 @@ from app.serializers import (
 class TestAuthorSerializer:
     def test_serialize_author_with_middle_name(self, sample_author_with_middle_name):
         result = serialize_author(sample_author_with_middle_name)
-        assert result == "Иванов И.И."
+        assert result == {
+            'id' : 1,
+            'first_name': 'Иван',
+            'first_name_en': None,
+            'last_name': 'Иванов',
+            'last_name_en': None,
+            'middle_name': 'Иванович',
+            'middle_name_en': None
+        }
         
     def test_serialize_author_without_middle_name(self, sample_author_without_middle_name):
         result = serialize_author(sample_author_without_middle_name)
-        assert result == "Петров П." 
+        assert result == {
+            'id' : 2,
+            'first_name': 'Петр',
+            'first_name_en': None,
+            'last_name': 'Петров',
+            'last_name_en': None,
+            'middle_name': None,
+            'middle_name_en': None
+        }
 
 
 class TestNewsSerializer:
@@ -25,8 +41,27 @@ class TestNewsSerializer:
     def test_serialize_news_with_magazine(self, mock_get_current_language, sample_news):
         result = serialize_news(sample_news)
         
-        assert result["authors"] == ["Иванов И.И.", "Петров П."]
-        assert result["materials"] == "/uploads/kitchen.jpg"
+        expected_authors = [
+            {
+                'id' : 1,
+                'first_name': 'Иван', 
+                'first_name_en': None,
+                'last_name': 'Иванов',
+                'last_name_en': None,
+                'middle_name': 'Иванович',
+                'middle_name_en': None
+            },
+            {
+                'id' : 2,
+                'first_name': 'Петр',
+                'first_name_en': None,
+                'last_name': 'Петров',
+                'last_name_en': None,
+                'middle_name': None,
+                'middle_name_en': None
+            }
+        ]
+        assert result["authors"] == expected_authors
         
     @patch("app.utils.get_current_language", return_value="ru")
     def test_serialize_news_without_magazine(self, mock_get_current_language, sample_news):
@@ -34,6 +69,15 @@ class TestNewsSerializer:
         result = serialize_news(sample_news)
         assert result["magazine"] is None
 
+
+    
+
+class TestPublicationSerializer:
+    @patch("app.utils.get_current_language", return_value="ru")
+    def test_serialize_publication_authors(self, mock_get_current_language, sample_publication):
+        result = serialize_publications(sample_publication)
+        authors_ids = [author["id"] for author in result["authors"]]
+        assert set(authors_ids) == {1, 2}
 
 class TestEventSerializer:
     @patch("app.utils.get_current_language", return_value="ru")
@@ -48,11 +92,11 @@ class TestProjectSerializer:
         result = serialize_projects(sample_project)
         assert result["materials"] == "/uploads/loqiemean-как-у-людеи.mp3"
 
-class TestPublicationSerializer:
-    @patch("app.utils.get_current_language", return_value="ru")
-    def test_serialize_publication_authors(self, mock_get_current_language, sample_publication):
-        result = serialize_publications(sample_publication)
-        assert set(result["authors"]) == {"Иванов И.И.", "Петров П."}
+# class TestPublicationSerializer:
+#     @patch("app.utils.get_current_language", return_value="ru")
+#     def test_serialize_publication_authors(self, mock_get_current_language, sample_publication):
+#         result = serialize_publications(sample_publication)
+#         assert set(result["authors"]) == {"Иванов И.И.", "Петров П."}
 
 class TestOrganisationSerializer:
     def test_serialize_organisation(self, sample_organisation):

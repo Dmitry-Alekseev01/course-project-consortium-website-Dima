@@ -126,7 +126,7 @@ def get_project_by_id(project_id):
 # Маршрут для получения всех новостей
 @main.route('/api/news', methods=['GET'])
 def get_news():
-    all_news = db.session.scalars(sa_select(News)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
+    all_news = db.session.scalars(sa_select(News)).all()
     news_list = []
     for news in all_news:
         news_list.append(serializers.serialize_news(news))
@@ -134,9 +134,9 @@ def get_news():
 
 
 # Маршрут для получения новости по ID
-@main.route('/api/news/<int:news_id>', methods=['GET'])  # Добавил <int:news_id> для корректного маршрута
+@main.route('/api/news/<int:news_id>', methods=['GET'])
 def get_news_by_id(news_id):
-    news = db.session.get(News, news_id)  # ЗАМЕНА: query.get() -> session.get()
+    news = db.session.get(News, news_id)
     if news:
         return jsonify(serializers.serialize_news(news)), 200
     else:
@@ -146,7 +146,7 @@ def get_news_by_id(news_id):
 # Маршрут для получения всех публикаций
 @main.route('/api/publications', methods=['GET'])
 def get_publications():
-    all_publications = db.session.scalars(sa_select(Publications)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
+    all_publications = db.session.scalars(sa_select(Publications)).all() 
     publications_list = []
     for publication in all_publications:
         publications_list.append(serializers.serialize_publications(publication))
@@ -220,17 +220,11 @@ def get_organisation_by_id(organisation_id):
 #     return jsonify(authors_list), 200
 
 
-
-
 @main.route('/api/magazines/<int:magazine_id>', methods=['GET']) 
 def get_magazine_by_id(magazine_id):
     magazine = db.session.get(Magazine, magazine_id) 
     if magazine:
-        return jsonify({
-            'id': magazine.id,
-            'name': magazine.name,
-            'name_en': magazine.name_en
-        }), 200
+        return jsonify(serializers.serialize_magazine(magazine)), 200
     else:
         return jsonify({'error': 'магазин не найден'}), 404
 
@@ -238,41 +232,21 @@ def get_magazine_by_id(magazine_id):
 @main.route('/api/magazines', methods=['GET'])
 def get_magazines():
     magazines = db.session.scalars(sa_select(Magazine)).all()
-    magazines_list = [{
-        'id': mag.id,
-        'name': mag.name,
-        'name_en': mag.name_en
-    } for mag in magazines]
+    magazines_list = [serializers.serialize_magazine(mag) for mag in magazines]
     return jsonify(magazines_list), 200
 
 @main.route('/api/authors/<int:author_id>', methods=['GET']) 
 def get_author_by_id(author_id):
     author = db.session.get(Author, author_id) 
     if author:
-        return {
-            'id': author.id,
-            'first_name': author.first_name,
-            'first_name_en': author.first_name_en,
-            'last_name': author.last_name,
-            'last_name_en': author.last_name_en,
-            'middle_name': author.middle_name,
-            'middle_name_en': author.middle_name_en
-        }, 200
+        return jsonify(serializers.serialize_author(author)), 200
     else:
         return jsonify({'error': 'автор не найден'}), 404
 
 @main.route('/api/authors', methods=['GET'])
 def get_authors():
     authors = db.session.scalars(sa_select(Author)).all() 
-    authors_list = [{
-        'id': author.id,
-        'first_name': author.first_name,
-        'first_name_en': author.first_name_en,
-        'last_name': author.last_name,
-        'last_name_en': author.last_name_en,
-        'middle_name': author.middle_name,
-        'middle_name_en': author.middle_name_en
-    } for author in authors]
+    authors_list = [serializers.serialize_author(author) for author in authors]
     return jsonify(authors_list), 200
 
 
