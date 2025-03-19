@@ -4,18 +4,7 @@ from datetime import datetime, time, date
 from .translator import translate_to_english
 
 db = SQLAlchemy()
-# class TranslateMixin:
-    
-#     translations = ()
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-        
-#         for translation_from, translation_to in self.translations:
-#             attribute_from = getattr(self, translation_from)
-#             attribute_to = getattr(self, translation_to)
-#             if attribute_from and not attribute_to:
-#                 translated_value = translate_to_english(attribute_from) or attribute_from
-#                 setattr(self, translation_to, translated_value)
+
 
 
 class TranslateMixin:
@@ -114,15 +103,7 @@ class Event(TranslateMixin, db.Model):
         ('description', 'description_en')
     )
 
-    # @property
-    # def title_display(self):
-    #     language = utils.get_current_language()
-    #     return self.title_en if language == 'en' else self.title
 
-    # @property
-    # def description_display(self):
-    #     language = utils.get_current_language()
-    #     return self.description_en if language == 'en' else self.description
 
 # Модель для новостей
 class News(TranslateMixin, db.Model):
@@ -145,59 +126,7 @@ class News(TranslateMixin, db.Model):
         ('content', 'content_en')
     )
     
-    # @property
-    # def title_display(self):
-    #     language = utils.get_current_language()
-    #     return self.title_en if language == 'en' else self.title
 
-    # @property
-    # def description_display(self):
-    #     language = utils.get_current_language()
-    #     return self.description_en if language == 'en' else self.description
-    
-    # def __init__(self, **kwargs):
-    #     super(News, self).__init__(**kwargs)
-        
-    #     if self.title and not self.title_en:
-    #         self.title_en = translate_to_english(self.title) or self.title
-        
-    #     if self.description and not self.description_en:
-    #         self.description_en = translate_to_english(self.description) or self.description
-    
-    
-    # def __init__(self, **kwargs):
-    #     super(News, self).__init__(**kwargs)
-    #     if self.title and not self.title_en:
-    #         try:
-    #             self.title_en = translate_to_english(self.title)
-    #             if self.title_en is None:
-    #                 raise ValueError("Translation failed for title")
-    #         except Exception as e:
-    #             print(f"Error translating title: {e}")
-    #             self.title_en = self.title  # Fallback
-
-    #     if self.description and not self.description_en:
-    #         try:
-    #             self.description_en = translate_to_english(self.description)
-    #             if self.description_en is None:
-    #                 raise ValueError("Translation failed for description")
-    #         except Exception as e:
-    #             print(f"Error translating description: {e}")
-    #             self.description_en = self.description  # Fallback
-
-    # def get_translated_field(self, field: str, language: str = 'ru') -> str:
-    #     """
-    #     Возвращает значение поля на указанном языке.
-    #     Если перевод отсутствует, возвращает значение на русском.
-
-    #     :param field: Название поля (например, 'title' или 'description').
-    #     :param language: Язык ('ru' или 'en').
-    #     :return: Значение поля на нужном языке.
-    #     """
-    #     if language == 'en':
-    #         translated_field = getattr(self, f"{field}_en")
-    #         return translated_field if translated_field else getattr(self, field)
-    #     return getattr(self, field)
 
 # Модель для публикаций
 class Publications(TranslateMixin, db.Model):
@@ -215,24 +144,6 @@ class Publications(TranslateMixin, db.Model):
         ('annotation', 'annotation_en')
     )
 
-    # @property
-    # def title_display(self):
-    #     language = utils.get_current_language()
-    #     return self.title_en if language == 'en' else self.title
-
-    # @property
-    # def annotation_display(self):
-    #     language = utils.get_current_language()
-    #     return self.annotation_en if language == 'en' else self.annotation   
-     
-    # def __init__(self, **kwargs):
-    #     super(Publications, self).__init__(**kwargs)
-        
-    #     if self.title and not self.title_en:
-    #         self.title_en = translate_to_english(self.title) or self.title
-        
-    #     if self.annotation and not self.annotation_en:
-    #         self.annotation_en = translate_to_english(self.annotation) or self.annotation
 
 # Модель для проектов
 class Project(TranslateMixin, db.Model):
@@ -254,24 +165,7 @@ class Project(TranslateMixin, db.Model):
         ('content', 'content_en')
     )
 
-    # @property
-    # def title_display(self):
-    #     language = utils.get_current_language()
-    #     return self.title_en if language == 'en' else self.title
 
-    # @property
-    # def description_display(self):
-    #     language = utils.get_current_language()
-    #     return self.description_en if language == 'en' else self.description
-    
-    # def __init__(self, **kwargs):
-    #     super(Project, self).__init__(**kwargs)
-        
-    #     if self.title and not self.title_en:
-    #         self.title_en = translate_to_english(self.title) or self.title
-        
-    #     if self.description and not self.description_en:
-    #         self.description_en = translate_to_english(self.description) or self.description
 
 # Модель для организаций
 class Organisation(db.Model):

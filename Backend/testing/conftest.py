@@ -254,15 +254,15 @@ def sample_news(sample_author_with_middle_name, sample_author_without_middle_nam
     news.authors.extend([sample_author_with_middle_name, sample_author_without_middle_name])
     return news
 
-@fixture
-def news_view():
-    """Создаем экземпляр MyModelView для модели News."""
-    return MyModelView(News, db.session)
+# @fixture
+# def news_view():
+#     """Создаем экземпляр MyModelView для модели News."""
+#     return MyModelView(News, db.session)
 
-@fixture
-def event_view():
-    """Создаем экземпляр MyModelView для модели Event."""
-    return MyModelView(Event, db.session)
+# @fixture
+# def event_view():
+#     """Создаем экземпляр MyModelView для модели Event."""
+#     return MyModelView(Event, db.session)
 
 @fixture
 def sample_event():
@@ -482,12 +482,17 @@ def mock_contact_data():
 #МОК ДЛЯ ПЕРЕВОДА
 @fixture(autouse=True)
 def auto_mock_translator(monkeypatch):
-    def mock_translate(text, translator=None):
-        return f"{text}_en"
     
+    # def mock_translate(text, translator=None):
+    #     return f"{text}_en"
+    mock_translate = lambda text, translator=None: f"{text}_en"
     #monkeypatch.setattr("app.models.translate_to_english", mock_translate)
     monkeypatch.setattr("app.translator.translate_to_english", mock_translate)
+    #monkeypatch.setattr("app.serializers.translate_to_english", mock_translate)
+    #monkeypatch.setattr("app.routes.translate_to_english", mock_translate)
     #yield
+
+
 
 # @fixture
 # def mock_mail(app_testing):
