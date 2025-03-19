@@ -37,6 +37,7 @@ services:
 
   frontend:
     image: leonidlivshitz/course-project-consortium-frontend
+    restart: always
     build: ./my-app
     depends_on:
       - web
