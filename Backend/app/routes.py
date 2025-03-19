@@ -7,7 +7,7 @@ from .models import db, Contact, Event, Project, News, Publications, Organisatio
 from flask_mail import Message
 from . import mail
 from . import serializers
-from .utils import get_current_language
+#from .utils import get_current_language
 import logging
 from datetime import datetime
 from enum import Enum, auto
@@ -33,23 +33,6 @@ def send_email(subject, sender, recipients, body):
         logging.error(f"Ошибка при отправке email: {e}")
         return False
 
-# @main.route('/api/get_language', methods=['GET'])
-# def get_language():
-#     return jsonify({'language': session.get('language', 'ru')}), 200
-
-# @main.route('/api/set_language', methods=['POST'])
-# def set_language():
-#     data = request.get_json()
-#     language = data.get('language')
-#     if language not in ['ru', 'en']:
-#         return jsonify({'error': 'Invalid language'}), 400
-
-#     session['language'] = language
-#     response = jsonify({'message': 'Language updated successfully'})
-#     # Добавляем CORS заголовки
-#     response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-#     response.headers.add('Access-Control-Allow-Credentials', 'true')
-#     return response
 
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
@@ -184,40 +167,6 @@ def get_organisation_by_id(organisation_id):
         return jsonify({'error': 'Организация не найдена'}), 404
 
 
-# @main.route('/api/magazines/<int:magazine_id>', methods=['GET']) 
-# def get_magazine_by_id(magazine_id):
-#     magazine = db.session.get(Magazine, magazine_id) 
-#     if magazine:
-#         return jsonify({'id': magazine.id, 'name': magazine.name}), 200
-#     else:
-#         return jsonify({'error': 'магазин не найден'}), 404
-    
-
-
-# # Маршрут для получения всех журналов
-# @main.route('/api/magazines', methods=['GET'])
-# def get_magazines():
-#     magazines = db.session.scalars(sa_select(Magazine)).all()  # ЗАМЕНА: query.all() -> session.scalars(select(...)).all()
-#     magazines_list = [{'id': mag.id, 'name': mag.name} for mag in magazines]
-#     return jsonify(magazines_list), 200
-
-# @main.route('/api/authors/<int:author_id>', methods=['GET']) 
-# def get_author_by_id(author_id):
-#     author = db.session.get(Author, author_id) 
-#     if author:
-#         return {'id': author.id, 'first_name': author.first_name, 
-#                      'last_name': author.last_name, 'middle_name': author.middle_name}, 200
-#     else:
-#         return jsonify({'error': 'автор не найден'}), 404
-
-# # Маршрут для получения всех авторов
-# @main.route('/api/authors', methods=['GET'])
-# def get_authors():
-#     authors = db.session.scalars(sa_select(Author)).all() 
-#     authors_list = [{'id': author.id, 'first_name': author.first_name, 
-#                      'last_name': author.last_name, 'middle_name': author.middle_name} 
-#                     for author in authors]
-#     return jsonify(authors_list), 200
 
 
 @main.route('/api/magazines/<int:magazine_id>', methods=['GET']) 
@@ -250,271 +199,6 @@ def get_authors():
     return jsonify(authors_list), 200
 
 
-# Это старый рабочий метод НЕ УДАЛЯТЬ
-# Маршрут для поиска
-# @main.route('/api/search', methods=['GET'])
-# def search():
-#     query = request.args.get('q', '').strip()
-#     print(f" Получен запрос на поиск: '{query}'")
-#     if not query:
-#         return jsonify({"error": "Пустой запрос"}), 400
-#     search_pattern = f"%{query}%"  # Поиск подстроки
-
-#     news_results = db.session.scalars(
-#         sa_select(News).filter(
-#             (News.title.ilike(search_pattern)) | 
-#             (News.description.ilike(search_pattern)) | 
-#             (News.content.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     publications_results = db.session.scalars(
-#         sa_select(Publications).filter(
-#             (Publications.title.ilike(search_pattern)) | 
-#             (Publications.annotation.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     projects_results = db.session.scalars(
-#         sa_select(Project).filter(
-#             (Project.title.ilike(search_pattern)) | 
-#             (Project.description.ilike(search_pattern)) | 
-#             (Project.content.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     events_results = db.session.scalars(
-#         sa_select(Event).filter(
-#             (Event.title.ilike(search_pattern)) | 
-#             (Event.description.ilike(search_pattern)) | 
-#             (Event.location.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     organisations_results = db.session.scalars(
-#         sa_select(Organisation).filter(
-#             Organisation.link.ilike(search_pattern)
-#         )
-#     ).all()
-
-#     authors_results = db.session.scalars(
-#         sa_select(Author).filter(
-#             (Author.first_name.ilike(search_pattern)) | 
-#             (Author.last_name.ilike(search_pattern)) | 
-#             (Author.middle_name.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     magazines_results = db.session.scalars(
-#         sa_select(Magazine).filter(
-#             Magazine.name.ilike(search_pattern)
-#         )
-#     ).all()
-
-#     results = {
-#         "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
-#         "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
-#         "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
-#         "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
-#         "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
-#         "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
-#         "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
-#     }
-#     return jsonify(results)
-
-
-
-# @main.route('/api/search', methods=['GET'])
-# def search():
-#     query = request.args.get('q', '').strip()
-#     sort_type_str = request.args.get('sort', '').strip()
-
-#     if not query:
-#         return jsonify({"error": "Пустой запрос"}), 400
-
-#     # Преобразуем строку в значение enum
-#     try:
-#         sort_type = SortType[sort_type_str.upper()]
-#     except KeyError:
-#         sort_type = None
-
-#     # Получаем параметры сортировки
-#     sort_params = get_sort_params(sort_type)
-#     sort_key = sort_params["sort_key"]
-#     reverse = sort_params["reverse"]
-
-#     search_pattern = f"%{query}%"
-
-
-#     # Получение и сортировка данных для каждой категории
-#     news_results = get_and_sort_results(
-#         News,
-#         [
-#             (News.title.ilike(search_pattern)) |
-#             (News.description.ilike(search_pattern)) |
-#             (News.content.ilike(search_pattern))
-#         ],
-#         sort_key=sort_key,
-#         reverse=reverse
-#     )
-
-#     publications_results = get_and_sort_results(
-#         Publications,
-#         [
-#             (Publications.title.ilike(search_pattern)) |
-#             (Publications.annotation.ilike(search_pattern))
-#         ],
-#         sort_key=sort_key,
-#         reverse=reverse
-#     )
-
-#     events_results = get_and_sort_results(
-#         Event,
-#         [
-#             (Event.description.ilike(search_pattern)) |
-#             (Event.location.ilike(search_pattern)) |
-#             (Event.title.ilike(search_pattern))
-#         ],
-#         sort_key=sort_key,
-#         reverse=reverse
-#     )
-
-#     projects_results = get_and_sort_results(
-#         Project,
-#         [
-#             (Project.description.ilike(search_pattern)) |
-#             (Project.content.ilike(search_pattern)) |
-#             (Project.title.ilike(search_pattern))
-#         ],
-#         sort_key=sort_key,
-#         reverse=reverse
-#     )
-
-#     organisations_results = db.session.scalars(
-#         sa_select(Organisation).filter(
-#             Organisation.link.ilike(search_pattern)
-#         )
-#     ).all()
-
-#     authors_results = db.session.scalars(
-#         sa_select(Author).filter(
-#             (Author.first_name.ilike(search_pattern)) | 
-#             (Author.last_name.ilike(search_pattern)) | 
-#             (Author.middle_name.ilike(search_pattern))
-#         )
-#     ).all()
-
-#     magazines_results = db.session.scalars(
-#         sa_select(Magazine).filter(
-#             Magazine.name.ilike(search_pattern)
-#         )
-#     ).all()
-
-
-#     results = {
-#          "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
-#          "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
-#          "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
-#          "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
-#          "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
-#          "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
-#          "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
-#     }
-#     return jsonify(results)
-
-
-
-# @main.route('/api/search', methods=['GET'])
-# def search():
-#     query = request.args.get('q', '').strip()
-#     sort_type_str = request.args.get('sort', '').strip()
-#     authors = request.args.getlist('authors[]')
-#     magazines = request.args.getlist('magazines[]')
-#     date_from = request.args.get('date_from', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
-#     date_to = request.args.get('date_to', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
-
-#     if not query:
-#         return jsonify({"error": "Пустой запрос"}), 400
-
-#     try:
-#         sort_type = SortType[sort_type_str.upper()]
-#     except KeyError:
-#         sort_type = None
-
-#     sort_params = get_sort_params(sort_type)
-#     sort_key = sort_params["sort_key"]
-#     reverse = sort_params["reverse"]
-#     search_pattern = f"%{query}%"
-
-#     # Базовые фильтры
-#     base_filters = {
-#         "news": [
-#             (News.title.ilike(search_pattern)) |
-#             (News.description.ilike(search_pattern)) |
-#             (News.content.ilike(search_pattern))
-#         ],
-#         "publications": [
-#             (Publications.title.ilike(search_pattern)) |
-#             (Publications.annotation.ilike(search_pattern))
-#         ],
-#         "events": [
-#             (Event.description.ilike(search_pattern)) |
-#             (Event.location.ilike(search_pattern)) |
-#             (Event.title.ilike(search_pattern))
-#         ],
-#         "projects": [
-#             (Project.description.ilike(search_pattern)) |
-#             (Project.content.ilike(search_pattern)) |
-#             (Project.title.ilike(search_pattern))
-#         ],
-#         "organisations": [
-#             Organisation.link.ilike(search_pattern)
-#         ],
-#         "authors": [
-#             (Author.first_name.ilike(search_pattern)) | 
-#             (Author.last_name.ilike(search_pattern)) | 
-#             (Author.middle_name.ilike(search_pattern))
-#         ],
-#         "magazines": [
-#             Magazine.name.ilike(search_pattern)
-#         ]
-#     }
-
-#     # Дполнительные фильтры
-#     if authors:
-#         base_filters["news"].append(News.authors.any(Author.id.in_(authors)))
-#         base_filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
-#         base_filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
-
-#     if magazines:
-#         base_filters["news"].append(News.magazine_id.in_(magazines))
-#         base_filters["publications"].append(Publications.magazine_id.in_(magazines))
-
-#     if date_from and date_to:
-#         base_filters["news"].append(News.publication_date.between(date_from, date_to))
-#         base_filters["publications"].append(Publications.publication_date.between(date_from, date_to))
-#         base_filters["events"].append(Event.publication_date.between(date_from, date_to))
-#         base_filters["projects"].append(Project.publication_date.between(date_from, date_to))
-
-#     # Получение и сортировка данных для каждой категории
-#     news_results = get_and_sort_results(News, base_filters["news"], sort_key=sort_key, reverse=reverse)
-#     publications_results = get_and_sort_results(Publications, base_filters["publications"], sort_key=sort_key, reverse=reverse)
-#     events_results = get_and_sort_results(Event, base_filters["events"], sort_key=sort_key, reverse=reverse)
-#     projects_results = get_and_sort_results(Project, base_filters["projects"], sort_key=sort_key, reverse=reverse)
-#     organisations_results = db.session.scalars(sa_select(Organisation).filter(*base_filters["organisations"])).all()
-#     authors_results = db.session.scalars(sa_select(Author).filter(*base_filters["authors"])).all()
-#     magazines_results = db.session.scalars(sa_select(Magazine).filter(*base_filters["magazines"])).all()
-
-#     results = {
-#          "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
-#          "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
-#          "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
-#          "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
-#          "organisations": [{"id": o.id, "link": o.link, "link": f"/organisations/{o.id}"} for o in organisations_results],
-#          "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
-#          "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
-#     }
-#     return jsonify(results)
 
 
 def get_and_sort_results(model, filters, sort_key=None, reverse=False):
@@ -538,161 +222,44 @@ def get_sort_params(sort_type):
     }
     return sort_mapping.get(sort_type, {"sort_key": None, "reverse": False})
 
-# def build_filters(search_pattern, authors, magazines, date_from, date_to):
-#     """
-#     Формирует словарь базовых фильтров для каждой категории поиска.
-#     Добавляет дополнительные фильтры (авторы, журналы, диапазон дат) только если они заданы.
-#     """
-#     filters = {
-#         "news": [
-#             (News.title.ilike(search_pattern)) |
-#             (News.description.ilike(search_pattern)) |
-#             (News.content.ilike(search_pattern))
-#         ],
-#         "publications": [
-#             (Publications.title.ilike(search_pattern)) |
-#             (Publications.annotation.ilike(search_pattern))
-#         ],
-#         "events": [
-#             (Event.description.ilike(search_pattern)) |
-#             (Event.location.ilike(search_pattern)) |
-#             (Event.title.ilike(search_pattern))
-#         ],
-#         "projects": [
-#             (Project.description.ilike(search_pattern)) |
-#             (Project.content.ilike(search_pattern)) |
-#             (Project.title.ilike(search_pattern))
-#         ],
-#         "organisations": [
-#             Organisation.link.ilike(search_pattern)
-#         ]
-#     }
+def build_text_filters(model, fields, search_pattern):
 
-#     # Добавляем фильтр по авторам, если они заданы
-#     if authors:
-#         filters["news"].append(News.authors.any(Author.id.in_(authors)))
-#         filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
-#         filters["projects"].append(Project.authors.any(Author.id.in_(authors)))
+    filters = []
+    
+    for field in fields:
+        if hasattr(model, field):
+            filters.append(getattr(model, field).ilike(search_pattern))
 
-#     # Фильтр по журналам
-#     if magazines:
-#         filters["news"].append(News.magazine_id.in_(magazines))
-#         filters["publications"].append(Publications.magazine_id.in_(magazines))
+        en_field = f"{field}_en"
+        if hasattr(model, en_field):
+            filters.append(getattr(model, en_field).ilike(search_pattern))
+    
+    return or_(*filters) if filters else None
 
-#     # Фильтр по диапазону дат
-#     if date_from and date_to:
-#         filters["news"].append(News.publication_date.between(date_from, date_to))
-#         filters["publications"].append(Publications.publication_date.between(date_from, date_to))
-#         filters["events"].append(Event.publication_date.between(date_from, date_to))
-#         filters["projects"].append(Project.publication_date.between(date_from, date_to))
-
-#     return filters
 
 
 def build_filters(query, authors, magazines, date_from, date_to):
-    words = query.strip()#.split()
+    word_pattern = f"%{query}%"
+    
     filters = {
         "news": [],
         "publications": [],
         "events": [],
         "projects": [],
         "organisations": [],
+        "magazines": [],
+        "authors": [],
     }
 
-    word_pattern = f"%{words}%"
-        
-    filters["news"].append(
-        or_(
-            News.title.ilike(word_pattern),
-            News.description.ilike(word_pattern),
-            News.content.ilike(word_pattern)
-        )
-    )
-    
-    # Публикации
-    filters["publications"].append(
-        or_(
-            Publications.title.ilike(word_pattern),
-            Publications.annotation.ilike(word_pattern)
-        )
-    )
-    
-    # События
-    filters["events"].append(
-        or_(
-            Event.description.ilike(word_pattern),
-            Event.location.ilike(word_pattern),
-            Event.title.ilike(word_pattern)
-        )
-    )
-    
-    # Проекты
-    filters["projects"].append(
-        or_(
-            Project.description.ilike(word_pattern),
-            Project.content.ilike(word_pattern),
-            Project.title.ilike(word_pattern)
-        )
-    )
-    
-    # Организации
-    filters["organisations"].append(
-        Organisation.link.ilike(word_pattern)
-    )
+    filters["news"].append(build_text_filters(News, ['title', 'description', 'content'], word_pattern))
+    filters["publications"].append(build_text_filters(Publications, ['title', 'annotation'], word_pattern))
+    filters["events"].append(build_text_filters(Event, ['title', 'description', 'location'], word_pattern))
+    filters["projects"].append(build_text_filters(Project, ['title', 'description', 'content'], word_pattern))
+    filters["organisations"].append(Organisation.link.ilike(word_pattern))
 
-    # Условия для каждого слова
-    # for word in words:
-    #     word_pattern = f"%{word}%"
-        
-    #     # Новости
-    #     filters["news"].append(
-    #         or_(
-    #             News.title.ilike(word_pattern),
-    #             News.description.ilike(word_pattern),
-    #             News.content.ilike(word_pattern)
-    #         )
-    #     )
-        
-    #     # Публикации
-    #     filters["publications"].append(
-    #         or_(
-    #             Publications.title.ilike(word_pattern),
-    #             Publications.annotation.ilike(word_pattern)
-    #         )
-    #     )
-        
-    #     # События
-    #     filters["events"].append(
-    #         or_(
-    #             Event.description.ilike(word_pattern),
-    #             Event.location.ilike(word_pattern),
-    #             Event.title.ilike(word_pattern)
-    #         )
-    #     )
-        
-    #     # Проекты
-    #     filters["projects"].append(
-    #         or_(
-    #             Project.description.ilike(word_pattern),
-    #             Project.content.ilike(word_pattern),
-    #             Project.title.ilike(word_pattern)
-    #         )
-    #     )
-        
-    #     # Организации
-    #     filters["organisations"].append(
-    #         Organisation.link.ilike(word_pattern)
-    #     )
+    filters["magazines"].append(build_text_filters(Magazine, ['name'], word_pattern))
+    filters["authors"].append(build_text_filters(Author, ['first_name', 'last_name', 'middle_name'], word_pattern))
 
-    # Объединяем условия для слов через OR внутри каждой категории
-    for category in filters:
-        if filters[category]:
-            combined_condition = or_(*filters[category])
-            filters[category] = [combined_condition]
-        else:
-            filters[category] = []
-
-    # Добавление фильтров по авторам, журналам и датам
     if authors:
         filters["news"].append(News.authors.any(Author.id.in_(authors)))
         filters["publications"].append(Publications.authors.any(Author.id.in_(authors)))
@@ -762,10 +329,10 @@ def search():
         authors_results.update(project.authors)
 
     results = {
-        "news": [{"id": n.id, "title": n.title, "link": f"/news/{n.id}"} for n in news_results],
-        "publications": [{"id": p.id, "title": p.title, "link": f"/publications/{p.id}"} for p in publications_results],
-        "projects": [{"id": pr.id, "title": pr.title, "link": f"/projects/{pr.id}"} for pr in projects_results],
-        "events": [{"id": e.id, "title": e.title, "link": f"/events/{e.id}"} for e in events_results],
+        "news": [{"id": n.id, "title": n.title, "title_en": n.title_en, "link": f"/news/{n.id}"} for n in news_results],
+        "publications": [{"id": p.id, "title": p.title, "title_en": p.title_en,"link": f"/publications/{p.id}"} for p in publications_results],
+        "projects": [{"id": pr.id, "title": pr.title, "title_en": pr.title_en,"link": f"/projects/{pr.id}"} for pr in projects_results],
+        "events": [{"id": e.id, "title": e.title, "title_en": e.title_en, "link": f"/events/{e.id}"} for e in events_results],
         "organisations": [{"id": o.id, "link": f"/organisations/{o.id}"} for o in organisations_results],
         # "authors": [{"id": a.id, "name": f"{a.last_name} {a.first_name} {a.middle_name or ''}".strip()} for a in authors_results],
         # "magazines": [{"id": m.id, "name": m.name} for m in magazines_results]
