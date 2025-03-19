@@ -1,23 +1,11 @@
-# Используем официальный образ Node.js
-FROM node:14
-
-# Устанавливаем рабочую директорию
+FROM node:20 as build-stage
 WORKDIR /app
-
-# Копируем package.json и package-lock.json
 COPY package*.json ./
-
-# Устанавливаем зависимости
 RUN npm install
-
-# Копируем остальные файлы
-COPY . .
-
-# Строим приложение
+COPY ./ .
 RUN npm run build
 
-# Указываем порт, на котором будет работать приложение
-EXPOSE 3000
-
-# Запускаем приложение
-CMD ["npm", "start"]
+FROM nginx:1 as production-stage
+RUN mkdir /app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-stage /app/build /app

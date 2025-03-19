@@ -33,7 +33,15 @@ services:
     networks:
       - backend-network
 
-
+  frontend:
+    image: leonidlivshitz/course-project-consortium-frontend
+    build: ./my-app
+    depends_on:
+      - web
+    ports:
+      - 3000:80
+    networks:
+      - backend-network
 
   # frontend:
   #   build: ./my-app
