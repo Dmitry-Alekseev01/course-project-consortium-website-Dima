@@ -12,6 +12,7 @@ const Publications = () => {
     const fetchPublications = async () => {
       try {
         //const response = await fetch('http://127.0.0.1:5000/api/publications');
+        console.log(`${process.env.REACT_APP_API_URL}/publications`)
         const response = await fetch(`${process.env.REACT_APP_API_URL}/publications`);
         const data = await response.json();
         setPublications(data);

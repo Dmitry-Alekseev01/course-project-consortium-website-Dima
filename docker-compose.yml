@@ -34,6 +34,8 @@ services:
       - backend-network
 
   frontend:
+    env_file: 
+      - './my-app/.env'
     image: leonidlivshitz/course-project-consortium-frontend
     build: ./my-app
     depends_on:
