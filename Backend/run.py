@@ -11,4 +11,5 @@ if __name__ == '__main__':
     import sys
     if '--seed' in sys.argv:
         seed_test_scrypts()
-    app.run(host='0.0.0.0', port=5000)
+    #app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
