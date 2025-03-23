@@ -37,8 +37,8 @@ services:
 
   frontend:
     image: leonidlivshitz/course-project-consortium-frontend
-    env_file: 
-      - './my-app/.env'
+    # env_file: 
+    #   - './my-app/.env'
     restart: always
     depends_on:
       - web
