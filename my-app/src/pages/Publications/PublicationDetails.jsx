@@ -11,8 +11,8 @@ const PublicationDetails = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/publications/${id}`)
-    //fetch(`http://94.158.219.154:5000/api/publications/${id}`)
+    //fetch(`http://127.0.0.1:5000/api/publications/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Публикация не найдена');

@@ -37,6 +37,8 @@ services:
 
   frontend:
     image: leonidlivshitz/course-project-consortium-frontend
+    environment:
+      - REACT_APP_API_URL=http://web:80/api
     restart: always
     build: ./my-app
     depends_on:

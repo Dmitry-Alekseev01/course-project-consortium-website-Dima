@@ -100,7 +100,7 @@ def create_app(config_path = 'app.config.Config', mail = mail):
 
     #CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
     CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost",  "http://localhost:5000", "http://localhost:8080", "http://94.158.219.154:3000",
-    "http://frontend:80"])
+    "http://frontend:80", "http://kapitanlevan.com:3000"])
 
     with app.app_context():
         db.create_all()
