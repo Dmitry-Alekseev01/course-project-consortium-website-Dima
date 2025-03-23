@@ -11,7 +11,7 @@ const Publications = () => {
   useEffect(() => {
     const fetchPublications = async () => {
       try {
-        const response = await fetch ("http://94.158.219.154:5000/api/publications")//await fetch('http://127.0.0.1:5000/api/publications');
+        const response = await fetch('http://127.0.0.1:5000/api/publications');
         const data = await response.json();
         setPublications(data);
       } catch (error) {
