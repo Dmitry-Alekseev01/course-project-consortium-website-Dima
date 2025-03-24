@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import SortButton from "../../components/SortButton/SortButton";
@@ -6,10 +6,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthorFilter from "../../components/FilterButtonAuthors/FilterButtonAuthors";
 import MagazineFilter from "../../components/FilterButtonJournals/FilterButtonJournals";
 import { Link } from "react-router-dom";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 // import DateFilter from "../../components/FilterButtonDate/FilterButtonDate";
 
 const SearchResults = () => {
+  const { language } = useContext(LanguageContext);
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -96,7 +98,7 @@ const SearchResults = () => {
     <div>
       <Navbar />
       <div className="news-header">
-        <h2>Результаты поиска по запросу: "{query}"</h2>
+        <h2>{language === 'ru' ? 'Результаты поиска' : 'Search results'}: "{query}"</h2>
         <SortButton onSort={handleSort} />
         <AuthorFilter onApply={handleAuthorFilter} />
         <MagazineFilter onApply={handleMagazineFilter} />
@@ -119,7 +121,7 @@ const SearchResults = () => {
           ) : null
         )
       ) : (
-        <p>Загрузка...</p>
+        <p>{language === 'ru' ? 'Загрузка...' : 'Loading...'}</p>
       )}
       <Footer />
     </div>

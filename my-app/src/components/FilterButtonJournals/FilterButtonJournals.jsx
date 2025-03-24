@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useContext, useState, useEffect } from 'react';
 import '../../components/FilterButtonAuthors/FilterButtonAuthors.css';
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 const JournalFilter = ({ onApply }) => {
+  const { language } = useContext(LanguageContext);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedAuthors, setSelectedMagazines] = useState([]);
   const [magazines, setMagazines] = useState([]);
@@ -22,7 +24,7 @@ const JournalFilter = ({ onApply }) => {
 
   return (
     <div className="author-filter">
-      <button className="filter-button" onClick={toggleDropdown}>Журналы</button>
+      <button className="filter-button" onClick={toggleDropdown}> {language === 'ru' ? 'Журналы' : 'Journals'}</button>
       
       {isOpen && (
         <div className="dropdown-content">
@@ -46,8 +48,8 @@ const JournalFilter = ({ onApply }) => {
               onApply(selectedAuthors);
               setIsOpen(false);
             }}>
-            Применить
-          </button>
+            {language === 'ru' ? 'Применить' : 'Apply'}
+            </button>
         </div>
       )}
     </div>

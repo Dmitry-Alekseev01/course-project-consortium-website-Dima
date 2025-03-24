@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, {useContext, useState } from 'react';
 import './ContactForm.css'
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const ContactForm = () => {
     message: '',
   });
 
+  const { language } = useContext(LanguageContext);
   const [status, setStatus] = useState(null);
 
   const handleChange = (e) => {
@@ -47,13 +49,15 @@ const ContactForm = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-6 form-wrapper">
-            <h2>Свяжитесь с нами</h2>
-            <p>Мы всегда рады вашим вопросам и предложениям. Напишите нам, и мы ответим в кратчайшие сроки!</p>
+            {/* <h2>Свяжитесь с нами</h2> */}
+            <h2>{language === 'ru' ? 'Свяжитесь с нами' : 'Connect to us'}</h2>
+            {/* <p>Мы всегда рады вашим вопросам и предложениям. Напишите нам, и мы ответим в кратчайшие сроки!</p> */}
+            <p>{language === 'ru' ? 'Мы всегда рады вашим вопросам и предложениям. Напишите нам, и мы ответим в кратчайшие сроки!' : 'We always welcome your questions and suggestions. Write to us and we will respond as soon as possible!'}</p>
             <form onSubmit={handleSubmit} className="contact-form">
               <input
                 type="text"
                 name="name"
-                placeholder="Имя"
+                placeholder={language === 'ru' ? "Имя" : "Name"}
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -69,7 +73,7 @@ const ContactForm = () => {
               <input
                 type="text"
                 name="phone"
-                placeholder="Телефон"
+                placeholder={language === 'ru' ? "Телефон" : "Telephone"}
                 value={formData.phone}
                 onChange={handleChange}
                 required
@@ -77,24 +81,24 @@ const ContactForm = () => {
               <input
                 type="text"
                 name="company"
-                placeholder="Компания"
+                placeholder={language === 'ru' ? "Компания" : "Company"}
                 value={formData.company}
                 onChange={handleChange}
               />
               <textarea
                 name="message"
-                placeholder="Сообщение"
+                placeholder={language === 'ru' ? "Сообщение" : "Message"}
                 value={formData.message}
                 onChange={handleChange}
                 required
               ></textarea>
-              <button type="submit" className="btn-submit">Отправить</button>
+              <button type="submit" className="btn-submit">{language === 'ru' ? "Отправить" : "Send"}</button>
             </form>
-            {status === 'success' && <p className="success">Сообщение отправлено!</p>}
-            {status === 'error' && <p className="error">Ошибка при отправке. Попробуйте позже.</p>}
+            {status === 'success' && <p className="success">{language === 'ru' ? "Сообщение отправлено!" : "Message is sent!"}</p>}
+            {status === 'error' && <p className="error">{language === 'ru' ? "Ошибка при отправке. Попробуйте позже." : "Sending error. Retry later."}</p>}
           </div>
           <div className="col-lg-6">
-            <h3>Наш адрес</h3>
+            <h3>{language === 'ru' ? "Наш адрес" : "Our address"}</h3>
             <p>Russian Federation</p>
             <p>info@cardiogenetics.ru</p>
             <p>+7 123 456 7890</p>

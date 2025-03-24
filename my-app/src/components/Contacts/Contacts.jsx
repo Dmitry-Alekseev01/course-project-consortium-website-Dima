@@ -1,10 +1,13 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import './Contacts.css';
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 const Contacts = () => {
+  const { language } = useContext(LanguageContext);
+  
   return (
     <div className="contact-field" id="contacts">
-      <h2>Контакты</h2>
+      <h2>{language === 'ru' ? "Контакты" : "Contacts"}</h2>
       <div className="contact-info">
         <div className="contact-item">
           <i className="icon-phone"></i>

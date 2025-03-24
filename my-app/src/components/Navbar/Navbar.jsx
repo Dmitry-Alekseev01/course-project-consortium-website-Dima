@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
+import React, {useContext, useState } from "react";
 import { Link } from "react-router";
 import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import LanguageButton from "../../components/ChangeLanguageButton/ChangeLanguageButton";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 const Navbar = () => {
+  const { language } = useContext(LanguageContext);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
@@ -64,7 +67,7 @@ const Navbar = () => {
       <div className={`search-bar ${isSearchOpen ? "active" : ""}`} style={{ top: isSearchOpen ? "0" : "-100px" }}>
         <input
           type="text"
-          placeholder="Поиск..."
+          placeholder={language === 'ru' ? 'Поиск...' : 'Search...'}
           value={searchQuery}
           onChange={handleSearchChange}
           onKeyDown={handleSearchKeyPress}
@@ -99,12 +102,12 @@ const Navbar = () => {
             <img src="/hse_logo.png" alt="HSE Logo" />
           </Link>
           <ul className="nav-menu">
-            <li className="nav-item"><Link to="/" className="nav-link">Главная</Link></li>
-            <li className="nav-item"><Link to="/organisations" className="nav-link">Организации</Link></li>
-            <li className="nav-item"><Link to="/publications" className="nav-link">Публикации</Link></li>
-            <li className="nav-item"><Link to="/news" className="nav-link">Новости</Link></li>
-            <li className="nav-item"><Link to="/projects" className="nav-link">Проекты</Link></li>
-            <li className="nav-item"><Link to="/events" className="nav-link">События</Link></li>
+            <li className="nav-item"><Link to="/" className="nav-link">{language === 'ru' ? 'Главная' : 'Home'}</Link></li>
+            <li className="nav-item"><Link to="/organisations" className="nav-link">{language === 'ru' ? 'Организации' : 'Organisations'}</Link></li>
+            <li className="nav-item"><Link to="/publications" className="nav-link">{language === 'ru' ? 'Публикации' : 'Publications'}</Link></li>
+            <li className="nav-item"><Link to="/news" className="nav-link">{language === 'ru' ? 'Новости' : 'News'}</Link></li>
+            <li className="nav-item"><Link to="/projects" className="nav-link">{language === 'ru' ? 'Проекты' : 'Projects'}</Link></li>
+            <li className="nav-item"><Link to="/events" className="nav-link">{language === 'ru' ? 'События' : 'Events'}</Link></li>
           </ul>
           <div className="search-icon" onClick={toggleSearch}>
             <img src="/loopa.png" alt="Поиск" />
