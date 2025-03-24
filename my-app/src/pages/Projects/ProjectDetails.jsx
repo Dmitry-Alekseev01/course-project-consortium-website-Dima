@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../Events/EventDetail.css';
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
 
 const ProjectDetails = () => {
   const { id } = useParams(); // Извлекаем id из URL
@@ -12,7 +13,7 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     // Запрашиваем данные о проекте с бэкенда по его ID
-    fetch(`http://127.0.0.1:5000/api/projects/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/projects/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Проект не найден');
@@ -53,9 +54,9 @@ const ProjectDetails = () => {
         {project.materials && (
           <p>
             <strong>Материалы:</strong>{" "}
-            <a href={`/uploads/${project.materials}`} download>
+            <Link to={`/uploads/${project.materials}`} download>
               Скачать
-            </a>
+            </Link>
           </p>
         )}
       </div>

@@ -8,7 +8,8 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/projects')
+    // fetch('http://127.0.0.1:5000/api/projects')
+    fetch(`${process.env.REACT_APP_API_URL}/projects`)
       .then((response) => response.json())
       .then((data) => setProjects(data))
       .catch((error) => console.error('Ошибка при загрузке проектов:', error));
@@ -44,15 +45,15 @@ const Projects = () => {
         );
       case "pdf":
         return (
-          <a href={fileUrl} download>
+          <Link to={fileUrl} download>
             Скачать PDF
-          </a>
+          </Link>
         );
       default:
         return (
-          <a href={fileUrl} download>
+          <Link to={fileUrl} download>
             Скачать файл
-          </a>
+          </Link>
         );
     }
   };
@@ -71,7 +72,8 @@ const Projects = () => {
             <p><strong>Текст:</strong> {project.content}</p>
             <p>
               <strong>Материалы:</strong>{" "}
-              {project.materials ? renderFile(`http://127.0.0.1:5000${project.materials}`) : "Файл отсутствует"}
+              {/* renderFile(`${process.env.REACT_APP_API_URL}/${news.materials} */}
+              {project.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${projects.materials}`) : "Файл отсутствует"}
             </p>
             <Link to={`/projects/${project.id}`} state={project} className="project-link">
               Подробнее

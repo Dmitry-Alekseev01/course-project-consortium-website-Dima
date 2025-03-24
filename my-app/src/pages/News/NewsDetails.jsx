@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../Events/EventDetail.css';
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
 
 const NewsDetails = () => {
   const { id } = useParams();
@@ -11,7 +12,8 @@ const NewsDetails = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/news/${id}`)
+    // fetch(`http://127.0.0.1:5000/api/news/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/news/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Новость не найдена');
@@ -54,9 +56,9 @@ const NewsDetails = () => {
         {news.materials && (
           <p>
             <strong>Материалы:</strong>{" "}
-            <a href={`/uploads/${news.materials}`} download>
+            <Link to={`/uploads/${news.materials}`} download>
               Скачать
-            </a>
+            </Link>
           </p>
         )}
       </div>
