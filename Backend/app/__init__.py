@@ -2,7 +2,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_cors import CORS
 import logging
-from .models import db
+from .models import Author, db
 #from .admin_views import register_admin_views 
 from flask_basicauth import BasicAuth
 from flask import Response, redirect, Flask
@@ -10,7 +10,13 @@ from flask_admin import AdminIndexView, Admin
 from flask_admin.contrib.sqla import ModelView
 from .translator import translate_to_english
 from werkzeug.exceptions import HTTPException
-# from .cache import cache
+from wtforms import SelectMultipleField
+from wtforms.validators import DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+
+
+
+
 
 # Инициализация расширений
 mail = Mail()
@@ -25,9 +31,36 @@ basic_auth = BasicAuth()
 #         super().init(message, Response(
 #             "You could not be authenticated. Please refresh the page.", 401,
 #             {'WWW-Authenticate': 'Basic realm="Login Required"'} ))
-
+class MyQuerySelectMultipleField(QuerySelectMultipleField):
+    def iter_choices(self):
+        for obj in self.query:
+            pk = self.get_pk(obj)
+            label = self.get_label(obj)
+            selected = self.data is not None and obj in self.data
+            yield (pk, label, selected, {})
 
 class MyModelView(ModelView):
+
+    def scaffold_form(self):
+        form_class = super().scaffold_form()
+        # Если по каким-то причинам атрибут _translations все равно добавился,
+        # удалим его из атрибутов формы.
+        if hasattr(form_class, '__translations__'):
+            delattr(form_class, '__translations__')
+        return form_class
+
+
+    form_overrides = {
+    'authors': MyQuerySelectMultipleField
+    }
+    form_args = {
+        'authors': {
+            'query': lambda: db.session.query(Author)
+        }
+    }
+
+    form_excluded_columns = ['__translations__']    
+
     def is_accessible(self):
         print("is_accesible_model")
         return basic_auth.authenticate()
@@ -60,13 +93,34 @@ class MyAdminIndexView(AdminIndexView):
         return basic_auth.challenge()
     
 
+
+    
+
+class NewsModelView(MyModelView):
+    # Переопределяем поле 'authors'
+    form_overrides = {
+        'authors': MyQuerySelectMultipleField
+    }
+    
+    # Если нужно, можно также добавить form_ajax_refs для других полей:
+    form_ajax_refs = {
+        'authors': {
+            'fields': ['first_name', 'last_name'],
+            'page_size': 10
+        }
+    }
+
+
+class MagazineModelView(MyModelView):
+    form_columns = ['name', 'name_en', 'news', 'publications']
+
 # В цикл запихнуть
 def register_admin_views(admin: Admin, db):
-    admin.add_view(MyModelView(models.Magazine, db.session, name='Журналы', category='Модели', endpoint='unique_magazine_admin'))
+    admin.add_view(MagazineModelView(models.Magazine, db.session, name='Журналы', category='Модели', endpoint='unique_magazine_admin'))
     admin.add_view(MyModelView(models.Author, db.session, name='Авторы', category='Модели', endpoint='unique_author_admin'))
     admin.add_view(MyModelView(models.Contact, db.session, name='Контакты', category='Модели', endpoint='unique_contact_admin'))
     admin.add_view(MyModelView(models.Event, db.session, name='События', category='Модели', endpoint='unique_event_admin'))
-    admin.add_view(MyModelView(models.News, db.session, name='Новости', category='Модели', endpoint='unique_news_admin'))
+    admin.add_view(NewsModelView(models.News, db.session, name='Новости', category='Модели', endpoint='unique_news_admin'))
     admin.add_view(MyModelView(models.Publications, db.session, name='Публикации', category='Модели', endpoint='unique_publications_admin'))
     admin.add_view(MyModelView(models.Project, db.session, name='Проекты', category='Модели', endpoint='unique_project_admin'))
     admin.add_view(MyModelView(models.Organisation, db.session, name='Организации', category='Модели', endpoint='unique_organisation_admin'))
@@ -80,6 +134,12 @@ def create_app(config_path = 'app.config.Config', mail = mail):
 
 
     basic_auth.init_app(app)
+
+    handler = logging.StreamHandler()
+    handler.setLevel(app.config.get("LOG_LEVEL", logging.INFO))
+    formatter = logging.Formatter(app.config.get("LOG_FORMAT"))
+    handler.setFormatter(formatter)
+    app.logger.addHandler(handler)
 
     # Инициализация расширений
     db.init_app(app)
