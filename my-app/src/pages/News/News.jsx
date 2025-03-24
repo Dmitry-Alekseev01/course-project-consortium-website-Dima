@@ -95,11 +95,11 @@ const News = () => {
             <p><strong>Текст:</strong> {news.content}</p>
             <p>
               <strong>Материалы:</strong>{" "}
-              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${news.materials}`) : "Файл отсутствует"}
+              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${news.materials}`) : language === 'ru' ? 'Файл отсутствует' : 'No dile'}
               {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
             </p>
             <Link to={`/news/${news.id}`} state={news} className="news-link">
-              Подробнее
+              {language === 'ru' ? 'Узнать больше' : 'Read more'}            
             </Link>
           </div>
         ))}

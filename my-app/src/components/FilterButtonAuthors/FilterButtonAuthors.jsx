@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, {useContext, useState, useEffect } from 'react';
 import './FilterButtonAuthors.css';
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
+
 
 const AuthorFilter = ({ onApply }) => {
+  const { language } = useContext(LanguageContext);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [authors, setAuthors] = useState([]);
@@ -23,7 +26,7 @@ const AuthorFilter = ({ onApply }) => {
 
   return (
     <div className="author-filter">
-      <button className="filter-button" onClick={toggleDropdown}>Авторы</button>
+      <button className="filter-button" onClick={toggleDropdown}>{language === 'ru' ? 'Авторы' : 'Authors'}</button>
       
       {isOpen && (
         <div className="dropdown-content">
@@ -48,7 +51,7 @@ const AuthorFilter = ({ onApply }) => {
               onApply(selectedAuthors);
               setIsOpen(false);
             }}>
-            Применить
+            {language === 'ru' ? 'Применить' : 'Apply'}
           </button>
         </div>
       )}
