@@ -10,7 +10,7 @@ const News = () => {
   const [news, setNews] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/news')
+    fetch(`${process.env.REACT_APP_API_URL}/news`)
       .then((response) => response.json())
       .then((data) => setNews(data))
       .catch((error) => console.error('Ошибка при загрузке новостей:', error));
@@ -52,15 +52,15 @@ const News = () => {
         );
       case "pdf":
         return (
-          <a href={fileUrl} download>
+          <Link to={fileUrl} download>
             Скачать PDF
-          </a>
+          </Link>
         );
       default:
         return (
-          <a href={fileUrl} download>
+          <Link to={fileUrl} download>
             Скачать файл
-          </a>
+          </Link>
         );
     }
   };
@@ -95,7 +95,8 @@ const News = () => {
             <p><strong>Текст:</strong> {news.content}</p>
             <p>
               <strong>Материалы:</strong>{" "}
-              {news.materials ? renderFile(`http://127.0.0.1:5000${news.materials}`) : "Файл отсутствует"}
+              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${news.materials}`) : "Файл отсутствует"}
+              {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
             </p>
             <Link to={`/news/${news.id}`} state={news} className="news-link">
               Подробнее

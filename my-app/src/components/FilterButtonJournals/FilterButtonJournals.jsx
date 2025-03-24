@@ -7,7 +7,7 @@ const JournalFilter = ({ onApply }) => {
   const [magazines, setMagazines] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/magazines')
+    fetch(`${process.env.REACT_APP_API_URL}/magazines`)
       .then(res => res.json())
       .then(data => setMagazines(data))
       .catch(console.error);

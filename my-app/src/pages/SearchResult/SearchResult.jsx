@@ -5,6 +5,8 @@ import SortButton from "../../components/SortButton/SortButton";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthorFilter from "../../components/FilterButtonAuthors/FilterButtonAuthors";
 import MagazineFilter from "../../components/FilterButtonJournals/FilterButtonJournals";
+import { Link } from "react-router-dom";
+
 // import DateFilter from "../../components/FilterButtonDate/FilterButtonDate";
 
 const SearchResults = () => {
@@ -38,7 +40,7 @@ const SearchResults = () => {
         ...(filters.dateTo && { dateTo: filters.dateTo })
       });
 
-      const url = `http://127.0.0.1:5000/api/search?${params.toString()}`;
+      const url = `${process.env.REACT_APP_API_URL}/search?${params.toString()}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Ошибка сервера: ${response.status}`);
@@ -109,7 +111,7 @@ const SearchResults = () => {
               <ul>
                 {searchResults[category].map((item) => (
                   <li key={item.id}>
-                    <a href={item.link || "#"}>{item.title}</a>
+                    <Link to={item.link || "#"}>{item.title}</Link>
                   </li>
                 ))}
               </ul>

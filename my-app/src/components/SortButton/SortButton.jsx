@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import './SortButton.css'; // Подключаем стили
+import './SortButton.css'; 
+import { Link } from "react-router-dom";
+
 
 const SortButton = ({ onSort }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +22,10 @@ const SortButton = ({ onSort }) => {
       </button>
       {isOpen && (
         <div className="dropdown-content">
-          <a href="#" onClick={() => handleSort('alphabetical')}>По алфавиту (А - Я)</a>
-          <a href="#" onClick={() => handleSort('reverse_alphabetical')}>По алфавиту (Я - А)</a>
-          <a href="#" onClick={() => handleSort('date_asc')}>По дате (стар - нов)</a>
-          <a href="#" onClick={() => handleSort('date_desc')}>По дате (нов - стар)</a>
+          <Link to="#" onClick={() => handleSort('alphabetical')}>По алфавиту (А - Я)</Link>
+          <Link to="#" onClick={() => handleSort('reverse_alphabetical')}>По алфавиту (Я - А)</Link>
+          <Link to="#" onClick={() => handleSort('date_asc')}>По дате (стар - нов)</Link>
+          <Link to="#" onClick={() => handleSort('date_desc')}>По дате (нов - стар)</Link>
         </div>
       )}
     </div>

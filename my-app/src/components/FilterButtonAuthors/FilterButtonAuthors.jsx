@@ -7,7 +7,8 @@ const AuthorFilter = ({ onApply }) => {
   const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/authors')
+    fetch(`${process.env.REACT_APP_API_URL}/authors`)
+    // ${process.env.REACT_APP_API_URL}/news
       .then(res => res.json())
       .then(data => setAuthors(data))
       .catch(console.error);

@@ -42,7 +42,7 @@ const Navbar = () => {
     console.log(" Отправка запроса:", query);
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/search?q=${encodeURIComponent(query)}`);
       console.log("Ответ от сервера (статус):", response.status);
       if (!response.ok) {
         throw new Error(`Ошибка сервера: ${response.status}`);
@@ -84,7 +84,7 @@ const Navbar = () => {
                 <ul>
                   {searchResults[category].map((item) => (
                     <li key={item.id}>
-                      <a href={item.link || "#"}>{item.title || item.name}</a>
+                      <Link to={item.link || "#"}>{item.title || item.name}</Link>
                     </li>
                   ))}
                 </ul>
@@ -95,16 +95,16 @@ const Navbar = () => {
       )}
       <nav className="navbar">
         <div className="navbar-container">
-          <a href="/" className="navbar-logo">
+          <Link to="/" className="navbar-logo">
             <img src="/hse_logo.png" alt="HSE Logo" />
-          </a>
+          </Link>
           <ul className="nav-menu">
-            <li className="nav-item"><a href="/" className="nav-link">Главная</a></li>
-            <li className="nav-item"><a href="/organisations" className="nav-link">Организации</a></li>
+            <li className="nav-item"><Link to="/" className="nav-link">Главная</Link></li>
+            <li className="nav-item"><Link to="/organisations" className="nav-link">Организации</Link></li>
             <li className="nav-item"><Link to="/publications" className="nav-link">Публикации</Link></li>
-            <li className="nav-item"><a href="/news" className="nav-link">Новости</a></li>
-            <li className="nav-item"><a href="/projects" className="nav-link">Проекты</a></li>
-            <li className="nav-item"><a href="/events" className="nav-link">События</a></li>
+            <li className="nav-item"><Link to="/news" className="nav-link">Новости</Link></li>
+            <li className="nav-item"><Link to="/projects" className="nav-link">Проекты</Link></li>
+            <li className="nav-item"><Link to="/events" className="nav-link">События</Link></li>
           </ul>
           <div className="search-icon" onClick={toggleSearch}>
             <img src="/loopa.png" alt="Поиск" />

@@ -7,7 +7,8 @@ const Events = () => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/events')
+    // fetch('http://127.0.0.1:5000/api/events')
+    fetch(`${process.env.REACT_APP_API_URL}/events`)
       .then(response => response.json())
       .then(data => setEvents(data))
       .catch(error => console.error('Error fetching events:', error));
