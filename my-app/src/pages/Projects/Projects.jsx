@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Projects.css";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { Link } from "react-router-dom";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 const Projects = () => {
+  const { language } = useContext(LanguageContext);
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
@@ -27,6 +30,14 @@ const Projects = () => {
     } else {
       return "unknown";
     }
+  };
+
+  const formatAuthors = (authors) => {
+    return authors.map(author => {
+      const firstName = author[`first_name_${language}`] || author.first_name;
+      const lastName = author[`last_name_${language}`] || author.last_name;
+      return `${firstName} ${lastName}`;
+    }).join(', ');
   };
 
   // Функция для отображения файла в зависимости от его типа
@@ -61,22 +72,40 @@ const Projects = () => {
   return (
     <div className="page">
       <Navbar />
-      <h1>Проекты</h1>
+      <h1>{language === 'ru' ? 'Проекты' : 'Projects'}</h1>
       <div className="projects-list">
         {projects.map((project) => (
           <div key={project.id} className="project">
-            <h2>{project.title}</h2>
-            <p><strong>Авторы:</strong> {project.authors.join(', ')}</p>
-            <p><strong>Дата публикации:</strong> {project.publication_date}</p>
-            <p><strong>Описание:</strong> {project.description}</p>
-            <p><strong>Текст:</strong> {project.content}</p>
+            {/* <h2>{project.title}</h2> */}
+            <h2>{project[`title_${language}`] || project.title}</h2>
+            {/* <p><strong>Авторы:</strong> {project.authors.join(', ')}</p> */}
+            <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(project.authors)}</p>
+            {/* <p><strong>Дата публикации:</strong> {project.publication_date}</p> */}
+            <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
+              {new Date(project.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
+            </p>
+            {/* <p><strong>Описание:</strong> {project.description}</p> */}
+            <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
+              {project[`description_${language}`] || project.description}
+            </p>
+            {/* <p><strong>Текст:</strong> {project.content}</p> */}
+            <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
+              {project[`content${language}`] || project.content}
+            </p>
             <p>
               <strong>Материалы:</strong>{" "}
               {/* renderFile(`${process.env.REACT_APP_API_URL}/${news.materials} */}
               {project.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${projects.materials}`) : "Файл отсутствует"}
             </p>
-            <Link to={`/projects/${project.id}`} state={project} className="project-link">
+            {/* <Link to={`/projects/${project.id}`} state={project} className="project-link">
               Подробнее
+            </Link> */}
+            <Link 
+              to={`/projects/${project.id}`} 
+              state={project} 
+              className="project-link"
+            >
+              {language === 'ru' ? 'Подробнее' : 'Read more'}
             </Link>
           </div>
         ))}

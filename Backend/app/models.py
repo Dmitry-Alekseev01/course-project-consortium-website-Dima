@@ -85,6 +85,9 @@ class Contact(db.Model):
     company = db.Column(db.String(100))
     message = db.Column(db.Text, nullable=False)
 
+
+
+
 # Модель для событий
 class Event(TranslateMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -172,4 +175,3 @@ class Organisation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image = db.Column(db.String(200), nullable=False)
     link = db.Column(db.String(200), nullable=False)
-
