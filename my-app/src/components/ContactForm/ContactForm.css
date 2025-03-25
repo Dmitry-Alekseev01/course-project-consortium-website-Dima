@@ -24,7 +24,7 @@
   
   .form-wrapper {
     background-color: white;
-    color: #173C1A;
+    color: black;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -79,8 +79,38 @@
     background-color: #d47a7a;
   }
   
+  .g-recaptcha {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    transform: scale(0.95);
+    transform-origin: 0 0;
+  }
+  
+  .success-message {
+    color: white;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: green;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .error-message {
+    color: white;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: red;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
   .success {
-    color: green;
+    color: white;
     margin-top: 1rem;
   }
   
@@ -95,11 +125,10 @@
   }
   
   .col-lg-6 p {
-    color: white;
+    /* color: #173C1A; */
     margin-bottom: 0.5rem;
   }
   
-  /* Адаптивность */
   @media (max-width: 992px) {
     .col-lg-6 {
       flex: 1 1 100%;
@@ -122,4 +151,3 @@
       padding: 0.5rem 1rem;
     }
   }
-  

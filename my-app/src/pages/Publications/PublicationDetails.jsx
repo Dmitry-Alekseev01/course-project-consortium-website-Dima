@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import { useParams } from 'react-router-dom';
 import '../Events/EventDetail.css';
 import Navbar from "../../components/Navbar/Navbar";
@@ -6,6 +7,7 @@ import Footer from "../../components/Footer/Footer";
 
 const PublicationDetails = () => {
   const { id } = useParams();
+  const { language } = useContext(LanguageContext);
   const [publication, setPublications] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,6 +32,14 @@ const PublicationDetails = () => {
       });
   }, [id]);
 
+  const formatAuthors = (authors) => {
+    return authors.map(author => {
+      const firstName = author[`first_name_${language}`] || author.first_name;
+      const lastName = author[`last_name_${language}`] || author.last_name;
+      return `${firstName} ${lastName}`;
+    }).join(', ');
+  };
+
   if (loading) {
     return <div>Загрузка...</div>;
   }
@@ -46,11 +56,31 @@ const PublicationDetails = () => {
     <section className="event-detail">
       <Navbar />
       <div className="container">
-        <h2>{publication.title}</h2>
+        {/* <h2>{publication.title}</h2>
         <p><strong>Авторы:</strong> {publication.authors.join(', ')}</p>
         <p><strong>Дата публикации:</strong> {publication.publication_date}</p>
         <p><strong>Журнал:</strong> {publication.magazine.name || "Не указан"}</p>
-        <p><strong>Описание:</strong> {publication.annotation}</p>
+        <p><strong>Описание:</strong> {publication.annotation}</p> */}
+        <h2>{publication[`title_${language}`] || publication.title}</h2>
+        <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(publication.authors)}</p>
+        <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
+        {new Date(publication.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
+        </p>
+        {publication.magazine && (
+        <p><strong>{language === 'ru' ? 'Журнал: ' : 'Journal: '}</strong> 
+        {publication.magazine[`name_${language}`] || publication.magazine.name || language === 'ru' ? 'Не указан: ' : 'No journal: '}
+        </p>
+        )}
+        <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
+        {publication[`annotation_${language}`] || publication.annotation}
+        </p>
+            {/* <Link 
+              to={`/publications/${publication.id}`} 
+              state={publication} 
+              className="publication-link"
+            >
+              {language === 'ru' ? 'Подробнее' : 'Read more'}
+            </Link> */}
       </div>
       <Footer />
     </section>

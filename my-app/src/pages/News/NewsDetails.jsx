@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import { useParams } from 'react-router-dom';
 import '../Events/EventDetail.css';
 import Navbar from "../../components/Navbar/Navbar";
@@ -7,6 +8,7 @@ import { Link } from "react-router-dom";
 
 const NewsDetails = () => {
   const { id } = useParams();
+  const { language } = useContext(LanguageContext);
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,6 +33,56 @@ const NewsDetails = () => {
       });
   }, [id]);
 
+    const formatAuthors = (authors) => {
+      return authors.map(author => {
+        const firstName = author[`first_name_${language}`] || author.first_name;
+        const lastName = author[`last_name_${language}`] || author.last_name;
+        return `${firstName} ${lastName}`;
+      }).join(', ');
+    };
+  
+    const getFileType = (fileName) => {
+      const extension = fileName.split(".").pop().toLowerCase();
+      if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
+        return "image";
+      } else if (["mp3", "wav"].includes(extension)) {
+        return "audio";
+      } else if (extension === "pdf") {
+        return "pdf";
+      } else {
+        return "unknown";
+      }
+    };
+  
+    const renderFile = (fileUrl) => {
+      const fileType = getFileType(fileUrl);
+  
+      switch (fileType) {
+        case "image":
+          return <img src={fileUrl} alt="Материалы" style={{ maxWidth: "100%", height: "auto" }} />;
+        case "audio":
+          return (
+            <audio controls>
+              <source src={fileUrl} type={`audio/${fileUrl.split(".").pop()}`} />
+              Ваш браузер не поддерживает аудио.
+            </audio>
+          );
+        case "pdf":
+          return (
+            <Link to={fileUrl} download>
+              Скачать PDF
+            </Link>
+          );
+        default:
+          return (
+            <Link to={fileUrl} download>
+              Скачать файл
+            </Link>
+          );
+      }
+    };
+  
+
   if (loading) {
     return <div>Загрузка...</div>;
   }
@@ -47,7 +99,7 @@ const NewsDetails = () => {
     <section className="event-detail">
       <Navbar />
       <div className="container">
-        <h2>{news.title}</h2>
+        {/* <h2>{news.title}</h2>
         <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
         <p><strong>Дата публикации:</strong> {news.publication_date}</p>
         <p><strong>Описание:</strong> {news.description}</p>
@@ -60,7 +112,40 @@ const NewsDetails = () => {
               Скачать
             </Link>
           </p>
-        )}
+        )} */}
+      <h2>{news[`title_${language}`] || news.title}</h2>
+      {/* <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
+      <p><strong>Дата публикации:</strong> {news.publication_date}</p> */}
+      <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(news.authors)}</p>
+      <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
+        {new Date(news.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
+      </p>
+      {/* <p><strong>Описание:</strong> {news.description}</p> */}
+      <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
+        {news[`description_${language}`] || news.description}
+      </p>
+      <p>
+      {news.magazine && (
+        <p><strong>{language === 'ru' ? 'Журнал: ' : 'Journal: '}</strong> 
+          {news.magazine[`name_${language}`] || news.magazine.name}
+        </p>
+      )}
+      </p>
+      {/* <p><strong>Журнал:</strong> {news.magazine.name || "Не издавалась"}</p> */}
+      {/* <p><strong>Текст:</strong> {news.content}</p> */}
+      <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
+        {news[`content${language}`] || news.content}
+      </p>
+      <p>
+        <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
+        <Link to={`/uploads/${news.materials}`} download>
+        {language === 'ru' ? 'Скачать' : 'Download'}
+            </Link>
+        {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
+      </p>
+      {/* <Link to={`/news/${news.id}`} state={news} className="news-link">
+        {language === 'ru' ? 'Узнать больше' : 'Read more'}            
+      </Link> */}
       </div>
       <Footer />
     </section>
