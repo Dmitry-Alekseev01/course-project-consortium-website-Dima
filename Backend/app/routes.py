@@ -19,8 +19,9 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 from flask_mail import Message
 
 # Маршрут для отдачи файлов
-@main.route('/uploads/<filename>')
+@main.route('/api/uploads/<filename>')
 def uploaded_file(filename):
+    print(UPLOADS_DIR)
     return send_from_directory(UPLOADS_DIR, filename)
 
 def send_email(subject, sender, recipients, body):

@@ -541,9 +541,9 @@ class TestSearchFunctions:
 
 class TestUploadsFile:
     def test_uploaded_wrong_file(self, client):
-        response = client.get("/uploads/goal")
+        response = client.get("/api/uploads/goal")
         assert response.status_code == 404
     def test_uploaded_correct_file(self, client, uploaded_organisation):
-        response = client.get(f"/uploads/{uploaded_organisation.image}")
+        response = client.get(f"/api/uploads/{uploaded_organisation.image}")
         assert response.status_code == 200
         
