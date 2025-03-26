@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
@@ -11,6 +12,9 @@ from pathlib import Path
 load_dotenv()
 
 class Config:
+
+    LOG_LEVEL = logging.DEBUG
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     POSTGRES_USER = os.environ.get(
     'POSTGRES_USER',

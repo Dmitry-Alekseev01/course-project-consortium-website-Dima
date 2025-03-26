@@ -1,3 +1,11 @@
+from dataclasses import field
+from unittest.mock import MagicMock, patch
+from sqlalchemy import Column, Integer
+from wtforms import Form
+from flask_admin.contrib.sqla import ModelView as BaseModelView
+from app.__init__ import CustomQuerySelectField, MyModelView, MyQuerySelectMultipleField
+from wtforms_sqlalchemy.fields import QuerySelectField
+from wtforms.form import FormMeta
 import pytest
 import base64
 from flask import url_for
@@ -94,20 +102,59 @@ class TestMyModelView:
             
             response = self.client.get(endpoint, headers=self.invalid_headers)
             assert response.status_code == 401
+
+
+
+def local_dummy_queryselectfield_init(self, label=None, validators=None, **kwargs):
+    self.label = label
+    self.validators = validators
+
+    for key, value in kwargs.items():
+        setattr(self, key, value)
     
+    if not hasattr(self, "filters"):
+        self.filters = []
 
 
-# class TestMyModelView:
-#     def test_on_model_change_translation(self, news_view, sample_news):
 
-#         news_view.on_model_change(None, sample_news, is_created=True)
+class TestQuery:
+    def test_custom_query_select_field_field_flags_conversion(
+        self, app_testing, monkeypatch, create_form_with_field_helper, dummy_query_factory
+    ):
+        
+        
+        monkeypatch.setattr(QuerySelectField, "__init__", local_dummy_queryselectfield_init)
+        
+        FormClass = create_form_with_field_helper(
+            CustomQuerySelectField,
+            query_factory=dummy_query_factory,
+            field_flags=("flag1", "flag2"),
+            default=lambda: None
+        )
+        form = FormClass()
+        field = form.test_field
 
-#         assert sample_news.title_en == "Новость 1_en"
-#         assert sample_news.description_en == "Описание новости 1_en"
+        assert isinstance(field.field_flags, dict)
+        assert field.field_flags.get("flag1") is True
+        assert field.field_flags.get("flag2") is True
 
-#     def test_on_model_change_event(self, event_view, sample_event):
+    def test_my_query_select_multiple_field_defaults(
+        self, app_testing, monkeypatch, create_form_with_field_helper
+    ):
+        monkeypatch.setattr(QuerySelectField, "__init__", local_dummy_queryselectfield_init)
+        FormClass = create_form_with_field_helper(
+            MyQuerySelectMultipleField,
+            default=lambda: []
+        )
+        form = FormClass()
+        field = form.test_field
 
-#         event_view.on_model_change(None, sample_event, is_created=True)
+        with app_testing.app_context():
+            query = field.query_factory()
+        assert query is not None
 
-#         assert sample_event.title_en == "Событие 1_en"
-#         assert sample_event.description_en == "Описание события 1_en"
+        dummy_author = Author(id=1, first_name="John", last_name="Doe")
+        label = field.get_label(dummy_author)
+        assert label == "John Doe"
+        pk = field.get_pk(dummy_author)
+        assert pk == 1
