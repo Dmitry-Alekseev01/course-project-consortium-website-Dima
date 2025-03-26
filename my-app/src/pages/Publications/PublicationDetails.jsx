@@ -68,7 +68,7 @@ const PublicationDetails = () => {
         </p>
         {publication.magazine && (
         <p><strong>{language === 'ru' ? 'Журнал: ' : 'Journal: '}</strong> 
-        {publication.magazine[`name_${language}`] || publication.magazine.name || language === 'ru' ? 'Не указан: ' : 'No journal: '}
+        {publication.magazine[`name_${language}`] || publication.magazine.name }
         </p>
         )}
         <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
