@@ -42,6 +42,8 @@ class Magazine(TranslateMixin, db.Model):
     __translations__ = (
         ('name', 'name_en'),
     )
+    def __str__(self):
+        return self.name
 
 # Таблица для авторов
 class Author(TranslateMixin, db.Model):
@@ -84,7 +86,8 @@ class Contact(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     company = db.Column(db.String(100))
     message = db.Column(db.Text, nullable=False)
-
+    def __str__(self):
+        return (f"{self.id} {self.name}")
 
 
 
@@ -105,6 +108,8 @@ class Event(TranslateMixin, db.Model):
         ('title', 'title_en'),
         ('description', 'description_en')
     )
+    def __str__(self):
+        return (f"{self.id} {self.title}")
 
 
 
@@ -121,14 +126,15 @@ class News(TranslateMixin, db.Model):
     content = db.Column(db.Text, nullable=False)
     content_en = db.Column(db.Text, nullable=True)
     materials = db.Column(db.String(300))  # Путь к файлу
-    authors = db.relationship('Author', secondary=news_authors, lazy='subquery',
+    authors = db.relationship('Author', secondary=news_authors, lazy='dynamic',
                               backref=db.backref('news', lazy=True), cascade="all, delete")
     __translations__ = (
         ('title', 'title_en'),
         ('description', 'description_en'),
         ('content', 'content_en')
     )
-    
+    def __str__(self):
+        return (f"{self.id} {self.title}")
 
 
 # Модель для публикаций
@@ -140,13 +146,14 @@ class Publications(TranslateMixin, db.Model):
     magazine_id = db.Column(db.Integer, db.ForeignKey('magazine.id', ondelete="CASCADE"), nullable=True)
     annotation = db.Column(db.Text, nullable=False)
     annotation_en = db.Column(db.Text, nullable=True)
-    authors = db.relationship('Author', secondary=publication_authors, lazy='subquery',
+    authors = db.relationship('Author', secondary=publication_authors, lazy='dynamic',
                               backref=db.backref('publications', lazy=True), cascade="all, delete")
     __translations__ = (
         ('title', 'title_en'),
         ('annotation', 'annotation_en')
     )
-
+    def __str__(self):
+        return (f"{self.id} {self.title}")
 
 # Модель для проектов
 class Project(TranslateMixin, db.Model):
@@ -160,13 +167,15 @@ class Project(TranslateMixin, db.Model):
     content = db.Column(db.Text, nullable=False)
     content_en = db.Column(db.Text, nullable=True)
     materials = db.Column(db.String(300))  # Путь к файлу
-    authors = db.relationship('Author', secondary=project_authors, lazy='subquery',
+    authors = db.relationship('Author', secondary=project_authors, lazy='dynamic',
                               backref=db.backref('projects', lazy=True), cascade="all, delete")
     __translations__ = (
         ('title', 'title_en'),
         ('description', 'description_en'),
         ('content', 'content_en')
     )
+    def __str__(self):
+        return (f"{self.id} {self.title}")
 
 
 

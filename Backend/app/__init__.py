@@ -2,7 +2,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_cors import CORS
 import logging
-from .models import Author, db
+from .models import Author, Magazine, db
 #from .admin_views import register_admin_views 
 from flask_basicauth import BasicAuth
 from flask import Response, redirect, Flask
@@ -11,8 +11,8 @@ from flask_admin.contrib.sqla import ModelView
 from .translator import translate_to_english
 from werkzeug.exceptions import HTTPException
 from wtforms import SelectMultipleField
-from wtforms.validators import DataRequired
-from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms.fields.core import Field
 
 
 
@@ -31,90 +31,90 @@ basic_auth = BasicAuth()
 #         super().init(message, Response(
 #             "You could not be authenticated. Please refresh the page.", 401,
 #             {'WWW-Authenticate': 'Basic realm="Login Required"'} ))
+
+class CustomQuerySelectField(QuerySelectField):
+    def __init__(self, *args, **kwargs):
+        # Если передан параметр field_flags, и он — кортеж, преобразуем его в dict
+        field_flags = kwargs.pop("field_flags", getattr(self, "field_flags", {}))
+        if isinstance(field_flags, tuple):
+            field_flags = {flag: True for flag in field_flags}
+        kwargs["field_flags"] = field_flags
+        super().__init__(*args, **kwargs)
+
+
+
 class MyQuerySelectMultipleField(QuerySelectMultipleField):
-    def iter_choices(self):
-        for obj in self.query:
-            pk = self.get_pk(obj)
-            label = self.get_label(obj)
-            selected = self.data is not None and obj in self.data
-            yield (pk, label, selected, {})
+    field_flags = {'query': True}
+
+    def __init__(self, *args, **kwargs):
+        if 'query_factory' not in kwargs:
+            kwargs['query_factory'] = lambda: db.session.query(Author)
+        if 'get_label' not in kwargs:
+            kwargs['get_label'] = self.get_label  # Явно указываем метод get_label
+        super().__init__(*args, **kwargs)
+
+
+
+    def get_pk(self, obj):
+        return obj.id
+
+    def get_label(self, obj):
+        return f"{obj.first_name} {obj.last_name}" 
 
 class MyModelView(ModelView):
-
-    def scaffold_form(self):
-        form_class = super().scaffold_form()
-        # Если по каким-то причинам атрибут _translations все равно добавился,
-        # удалим его из атрибутов формы.
-        if hasattr(form_class, '__translations__'):
-            delattr(form_class, '__translations__')
-        return form_class
-
+    # def scaffold_form(self):
+    #     form_class = super().scaffold_form()
+    #     if hasattr(form_class, '__translations__'):
+    #         delattr(form_class, '__translations__')
+    #     return form_class
 
     form_overrides = {
-    'authors': MyQuerySelectMultipleField
-    }
-    form_args = {
-        'authors': {
-            'query': lambda: db.session.query(Author)
-        }
+        'authors': MyQuerySelectMultipleField,
+        'magazine': QuerySelectField
     }
 
-    form_excluded_columns = ['__translations__']    
+    form_args = {
+
+    'authors': {
+        'query_factory': lambda: db.session.query(Author), 
+        'get_label': lambda obj: f"{obj.first_name} {obj.last_name}"
+    },
+    'magazine': {
+            'query_factory': lambda: db.session.query(Magazine),
+            'get_label': 'name',
+            'allow_blank': True
+        }
+}
+    form_excluded_columns = ['__translations__']
 
     def is_accessible(self):
-        print("is_accesible_model")
         return basic_auth.authenticate()
     
     def inaccessible_callback(self, name, **kwargs):
-        print("inaccesible_callback_model")
         return basic_auth.challenge()
-    
-    # def get_form_excluded_columns(self):
-    #     excluded = super().get_form_excluded_columns()
-    #     if hasattr(self.model, 'translations'):
-    #         excluded.extend([to_field for _, to_field in self.model.translations])
-    #     return excluded
 
-    # def on_model_change(self, form, model, is_created):
-    #     if hasattr(model, 'translations'):
-    #         for from_field, to_field in model.translations:
-    #             if getattr(model, from_field) and not getattr(model, to_field):
-    #                 translated = translate_to_english(getattr(model, from_field))
-    #                 setattr(model, to_field, translated or getattr(model, from_field))
-    #     return super().on_model_change(form, model, is_created)
-    
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
-        print("is_accesible")
         return basic_auth.authenticate()
     
     def inaccessible_callback(self, name, **kwargs):
-        print("inaccessible_callback")
         return basic_auth.challenge()
-    
 
-
-    
 
 class NewsModelView(MyModelView):
-    # Переопределяем поле 'authors'
-    form_overrides = {
-        'authors': MyQuerySelectMultipleField
-    }
-    
-    # Если нужно, можно также добавить form_ajax_refs для других полей:
+    can_create = True
+
     form_ajax_refs = {
         'authors': {
             'fields': ['first_name', 'last_name'],
             'page_size': 10
         }
     }
-
+    
 
 class MagazineModelView(MyModelView):
     form_columns = ['name', 'name_en', 'news', 'publications']
-
-# В цикл запихнуть
+    
 def register_admin_views(admin: Admin, db):
     admin.add_view(MagazineModelView(models.Magazine, db.session, name='Журналы', category='Модели', endpoint='unique_magazine_admin'))
     admin.add_view(MyModelView(models.Author, db.session, name='Авторы', category='Модели', endpoint='unique_author_admin'))
@@ -131,7 +131,6 @@ def create_app(config_path = 'app.config.Config', mail = mail):
     app = Flask(__name__)
     app.config.from_object(config_path)
     #app.config['DEBUG'] = True
-
 
     basic_auth.init_app(app)
 
