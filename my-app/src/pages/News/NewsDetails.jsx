@@ -134,13 +134,13 @@ const NewsDetails = () => {
       {/* <p><strong>Журнал:</strong> {news.magazine.name || "Не издавалась"}</p> */}
       {/* <p><strong>Текст:</strong> {news.content}</p> */}
       <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
-        {news[`content${language}`] || news.content}
+        {news[`content_${language}`] || news.content}
       </p>
       <p>
         <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
-        <Link to={`/uploads/${news.materials}`} download>
+        <Link to={`/api/uploads/${news.materials}`} download>
         {language === 'ru' ? 'Скачать' : 'Download'}
-            </Link>
+        </Link>
         {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
       </p>
       {/* <Link to={`/news/${news.id}`} state={news} className="news-link">
