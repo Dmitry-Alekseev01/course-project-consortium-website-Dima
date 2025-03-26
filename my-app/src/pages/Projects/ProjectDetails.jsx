@@ -121,7 +121,7 @@ const ProjectDetails = () => {
         {project[`description_${language}`] || project.description}
       </p>
       <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
-        {project[`content${language}`] || project.content}
+        {project[`content_${language}`] || project.content}
       </p>
       <p>
         <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
