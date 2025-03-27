@@ -330,6 +330,12 @@ def auto_mock_translator(monkeypatch):
 
 
 # @fixture
+# def mock_mail():
+#     mock = MagicMock()
+#     mock.send = MagicMock()
+#     yield mock
+
+# @fixture
 # def mock_db_session():
 #     """Мок для сессии базы данных."""
 #     with patch('app.models.db.session') as mock_session:

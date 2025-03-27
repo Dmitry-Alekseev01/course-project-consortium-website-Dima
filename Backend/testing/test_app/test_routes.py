@@ -1,7 +1,11 @@
 from datetime import datetime, date, time
+from sqlite3 import IntegrityError
 from unittest.mock import MagicMock, patch
-from app.routes import get_and_sort_results
+from unittest.mock import patch, MagicMock
+from flask_mail import Message
+from app.routes import get_and_sort_results, send_email
 from app import mail
+import pytest
 from app.models import (
     Organisation,
     Contact,
@@ -53,45 +57,210 @@ class TestOrganisationRoutes:
 #         data = response.get_json()
 #         assert data['message'] == 'Сообщение отправлено успешно!'
 
-class TestContactRoutes:
-    def test_create_contact(self, client, app_testing, mock_contact_data):
-        with app_testing.app_context():
-            with mail.record_messages() as outbox:
-                # Выполняем запрос с моковыми данными
-                response = client.post('/api/contact', json=mock_contact_data)
-                assert response.status_code == 201
-                data = response.get_json()
-                assert data['message'] == 'Сообщение отправлено успешно!'
+# class TestContactRoutes:
+#     def test_create_contact(self, client, app_testing, mock_contact_data):
+#         with app_testing.app_context():
+#             with mail.record_messages() as outbox:
+#                 # Выполняем запрос с моковыми данными
+#                 response = client.post('/api/contact', json=mock_contact_data)
+#                 assert response.status_code == 201
+#                 data = response.get_json()
+#                 assert data['message'] == 'Сообщение отправлено успешно!'
 
-                # Проверяем, что сообщение было отправлено
-                assert len(outbox) == 1
-                sent_message = outbox[0]
-                assert sent_message.subject == f"Новое сообщение от {mock_contact_data['name']}"
-                assert sent_message.sender == mock_contact_data['email']
-                assert sent_message.recipients == ['maxweinsberg25@gmail.com']
-                assert f"Имя: {mock_contact_data['name']}" in sent_message.body
-                assert f"Email: {mock_contact_data['email']}" in sent_message.body
-                assert f"Телефон: {mock_contact_data['phone']}" in sent_message.body
-                assert f"Сообщение: {mock_contact_data['message']}" in sent_message.body
+#                 # Проверяем, что сообщение было отправлено
+#                 assert len(outbox) == 1
+#                 sent_message = outbox[0]
+#                 assert sent_message.subject == f"Новое сообщение от {mock_contact_data['name']}"
+#                 assert sent_message.sender == mock_contact_data['email']
+#                 assert sent_message.recipients == ['maxweinsberg25@gmail.com']
+#                 assert f"Имя: {mock_contact_data['name']}" in sent_message.body
+#                 assert f"Email: {mock_contact_data['email']}" in sent_message.body
+#                 assert f"Телефон: {mock_contact_data['phone']}" in sent_message.body
+#                 assert f"Сообщение: {mock_contact_data['message']}" in sent_message.body
 
-    def test_create_contact_without_email(self, client, app_testing, mock_contact_data):
-        with app_testing.app_context():
-            with mail.record_messages() as outbox:
-                # Удаляем обязательное поле email
-                invalid_data = mock_contact_data.copy()
-                invalid_data["email"] = "invalid_email"
+#     def test_create_contact_without_email(self, client, app_testing, mock_contact_data):
+#         with app_testing.app_context():
+#             with mail.record_messages() as outbox:
+#                 # Удаляем обязательное поле email
+#                 invalid_data = mock_contact_data.copy()
+#                 invalid_data["email"] = "invalid_email"
 
-                # Выполняем запрос
-                response = client.post('/api/contact', json=invalid_data)
-                assert response.status_code == 400  # Ожидаем ошибку из-за невалидного email
-                assert len(outbox) == 0  # Проверяем, что сообщение не было отправлено
+#                 # Выполняем запрос
+#                 response = client.post('/api/contact', json=invalid_data)
+#                 assert response.status_code == 400  # Ожидаем ошибку из-за невалидного email
+#                 assert len(outbox) == 0  # Проверяем, что сообщение не было отправлено
 
-    def test_create_incorrect(self, client_mail, mock_contact_data):
-        #with app_testing_mail.app_context():
+#     def test_create_incorrect(self, client_mail, mock_contact_data):
+#         #with app_testing_mail.app_context():
         
-        response = client_mail.post('/api/contact', json=mock_contact_data)
-        assert response.status_code == 200
+#         response = client_mail.post('/api/contact', json=mock_contact_data)
+#         assert response.status_code == 200
                 
+
+class TestContactRoutes:
+    def test_create_contact_success(self, client, app_testing, mock_contact_data):
+        with app_testing.app_context(), mail.record_messages() as outbox:
+            response = client.post('/api/contact', json=mock_contact_data)
+            assert response.status_code == 201
+            data = response.get_json()
+            assert data['message'] == 'Сообщение отправлено успешно!'
+            
+            # Проверка сохранения в БД
+            contact = Contact.query.first()
+            assert contact.email == mock_contact_data['email']
+            assert contact.message == mock_contact_data['message']
+            
+            # Проверка отправки email
+            assert len(outbox) == 1
+            sent_msg = outbox[0]
+            assert mock_contact_data['email'] in sent_msg.body
+            assert 'не указано' in sent_msg.body  # Для пустого company
+
+    def test_create_contact_duplicate(self, client, app_testing, mock_contact_data):
+        with app_testing.app_context():
+            # Первое успешное создание
+            client.post('/api/contact', json=mock_contact_data)
+            
+            # Попытка создать дубликат
+            response = client.post('/api/contact', json=mock_contact_data)
+            assert response.status_code == 409
+            assert 'уже отправлено' in response.get_json()['error']
+
+    def test_create_contact_missing_fields(self, client, app_testing):
+        test_cases = [
+            ({'email': 'test@test.com'}, 'Missing required fields'),
+            ({'name': 'Test'}, 'Missing required fields'),
+            ({}, 'Missing required fields')
+        ]
+        
+        for data, error_msg in test_cases:
+            response = client.post('/api/contact', json=data)
+            assert response.status_code == 400
+            assert error_msg in response.get_json()['error']
+
+    def test_create_contact_invalid_email(self, client, app_testing, mock_contact_data):
+        invalid_data = mock_contact_data.copy()
+        invalid_data['email'] = 'invalid-email'
+        
+        response = client.post('/api/contact', json=invalid_data)
+        assert response.status_code == 400
+        assert 'Invalid email' in response.get_json()['error']
+
+    def test_create_contact_email_sending_failure(self, client_mail, mock_contact_data):
+        with patch('app.routes.send_email') as mock_send:
+            mock_send.return_value = False
+            
+            response = client_mail.post('/api/contact', json=mock_contact_data)
+            assert response.status_code == 500
+            data = response.get_json()
+            assert 'сохранено, но не отправлено' in data['error']
+            
+            # Проверка сохранения в БД
+            contact = Contact.query.first()
+            assert contact is not None
+
+    def test_create_contact_database_integrity_error(self, client, app_testing, mock_contact_data):
+        with app_testing.app_context():
+            # Мокируем ошибку целостности БД
+            with patch('app.routes.db.session.commit') as mock_commit:
+                mock_commit.side_effect = IntegrityError("Integrity Error", "params", "orig")
+                
+                response = client.post('/api/contact', json=mock_contact_data)
+                assert response.status_code == 500
+                data = response.get_json()
+                assert 'Database error' in data['error']
+
+    def test_create_contact_email_exception(self, client_mail, mock_contact_data):
+        with patch('app.routes.send_email') as mock_send:
+            mock_send.side_effect = Exception("SMTP Error")
+            
+            response = client_mail.post('/api/contact', json=mock_contact_data)
+            assert response.status_code == 500
+            data = response.get_json()
+            assert 'сохранено, но не отправлено' in data['error']
+            
+            contact = Contact.query.first()
+            assert contact is not None
+
+
+class TestEmailSending:
+    @patch('app.routes.mail')
+    def test_send_email_success(self, mock_mail):
+        mock_mail.send = MagicMock(return_value=None)
+        
+        result = send_email(
+            subject="Test Subject",
+            sender="test@example.com",
+            recipients=["recipient@example.com"],
+            body="Test Body"
+        )
+        
+        assert result is True
+        mock_mail.send.assert_called_once()
+        msg = mock_mail.send.call_args[0][0]
+        assert isinstance(msg, Message)
+        assert msg.subject == "Test Subject"
+        assert msg.sender == "test@example.com"
+        assert msg.recipients == ["recipient@example.com"]
+        assert msg.body == "Test Body"
+
+    @patch('app.routes.mail')
+    @pytest.mark.parametrize("exception, error_message", [
+        (Exception("SMTP error"), "SMTP error"),
+        (ConnectionError("Connection failed"), "Connection failed"),
+        (TimeoutError("Server timeout"), "Server timeout"),
+    ])
+    def test_send_email_failure(self, mock_mail, exception, error_message):
+        mock_mail.send = MagicMock(side_effect=exception)
+        
+        result = send_email(
+            subject="Test Subject",
+            sender="test@example.com",
+            recipients=["recipient@example.com"],
+            body="Test Body"
+        )
+        
+        assert result is False
+        mock_mail.send.assert_called_once()
+
+    @patch('app.routes.mail')
+    @patch('app.routes.logging.error')
+    def test_send_email_logging(self, mock_logging, mock_mail):
+        test_exception = Exception("Test error message")
+        mock_mail.send = MagicMock(side_effect=test_exception)
+        
+        send_email(
+            subject="Test",
+            sender="test@example.com",
+            recipients=["to@example.com"],
+            body="Body"
+        )
+        
+        expected_log_message = "Ошибка при отправке email: Test error message"
+        mock_logging.assert_called_once_with(expected_log_message)
+
+    @patch('app.routes.mail')
+    @patch('app.routes.Message')
+    def test_message_creation_failure(self, mock_message, mock_mail):
+
+        mock_message.side_effect = ValueError("Invalid message parameters")
+
+        result = send_email(
+            subject="Invalid Subject",
+            sender="invalid_sender",
+            recipients=[],
+            body=""
+        )
+        
+        assert result is False
+        mock_message.assert_called_once_with(
+            "Invalid Subject",
+            sender="invalid_sender",
+            recipients=[]
+        )
+        mock_mail.send.assert_not_called()
+
+
 
 class TestEventRoutes:
     def test_get_events(self, client, route_event):
