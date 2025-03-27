@@ -1,3 +1,4 @@
+from sqlite3 import IntegrityError
 from flask import Blueprint, request, jsonify, send_from_directory, Response, session
 from email_validator import validate_email, EmailNotValidError
 from sqlalchemy import select as sa_select
@@ -35,36 +36,106 @@ def send_email(subject, sender, recipients, body):
         return False
 
 
+
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
     print("create_contact --------------------------------------")
     data = request.get_json()
 
-    # Проверка валидности email
+    # Проверка обязательных полей
+    if not all(key in data for key in ['name', 'email', 'phone', 'message']):
+        return jsonify({'error': 'Missing required fields'}), 400
+
     try:
+        # Валидация email
         email_info = validate_email(data['email'], check_deliverability=False)
-        data['email'] = email_info.normalized
+        normalized_email = email_info.normalized
     except EmailNotValidError as e:
         logging.error(f"Email validation error: {e}")
-        return jsonify({'error': 'Invalid email address provided.'}), 400
+        return jsonify({'error': 'Invalid email address'}), 400
 
-    new_contact = Contact(
-        name=data['name'],
-        email=data['email'],
-        phone=data['phone'],
-        company=data.get('company'),
+    # Проверка на существующую запись
+    existing_contact = Contact.query.filter_by(
+        email=normalized_email,
         message=data['message']
-    )
-    db.session.add(new_contact)
-    db.session.commit()
+    ).first()
+
+    if existing_contact:
+        return jsonify({'error': 'Сообщение с этого email уже отправлено'}), 409
+
+    try:
+        new_contact = Contact(
+            name=data['name'],
+            email=normalized_email,
+            phone=data['phone'],
+            company=data.get('company'),
+            message=data['message']
+        )
+        
+        db.session.add(new_contact)
+        db.session.commit()
+
+    except IntegrityError as e:
+        db.session.rollback()
+        logging.error(f"Database error: {e}")
+        return jsonify({'error': 'Database error occurred'}), 500
 
     # Отправка email
-    subject = f'Новое сообщение от {data["name"]}'
-    body = f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
-    if send_email(subject, data['email'], ['maxweinsberg25@gmail.com'], body):
-        return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
-    else:
-        return jsonify({'error': 'Не удалось отправить сообщение'}), 200
+    try:
+        subject = f'Новое сообщение от {data["name"]}'
+        body = f"""Имя: {data['name']}
+Email: {normalized_email}
+Телефон: {data['phone']}
+Компания: {data.get('company', 'не указано')}
+Сообщение: {data['message']}"""
+        
+        if send_email(subject, normalized_email, ['maxweinsberg25@gmail.com'], body):
+            return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
+        else:
+            raise Exception('Email sending failed')
+
+    except Exception as e:
+        logging.error(f"Email sending error: {e}")
+        return jsonify({'error': 'Сообщение сохранено, но не отправлено'}), 500
+
+# @main.route('/api/contact', methods=['POST'])
+# def create_contact():
+#     print("create_contact --------------------------------------")
+#     data = request.get_json()
+
+#     # Проверка валидности email
+#     try:
+#         email_info = validate_email(data['email'], check_deliverability=False)
+#         data['email'] = email_info.normalized
+#     except EmailNotValidError as e:
+#         logging.error(f"Email validation error: {e}")
+#         return jsonify({'error': 'Invalid email address provided.'}), 400
+#     except IntegrityError as e:
+#         db.session.rollback()
+#         logging.error(f"Duplicate entry: {e}")
+#         return jsonify({'error': 'Сообщение с этого email уже отправлено'}), 409
+#     except Exception as e:
+#         db.session.rollback()
+#         logging.error(f"Error: {e}")
+#         return jsonify({'error': 'Internal server error'}), 500
+
+#     new_contact = Contact(
+#         name=data['name'],
+#         email=data['email'],
+#         phone=data['phone'],
+#         company=data.get('company'),
+#         message=data['message']
+#     )
+#     db.session.add(new_contact)
+#     db.session.commit()
+
+#     # Отправка email
+#     subject = f'Новое сообщение от {data["name"]}'
+#     body = f"Имя: {data['name']}\nEmail: {data['email']}\nТелефон: {data['phone']}\nКомпания: {data.get('company')}\nСообщение: {data['message']}"
+#     if send_email(subject, data['email'], ['maxweinsberg25@gmail.com'], body):
+#         return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
+#     else:
+#         return jsonify({'error': 'Не удалось отправить сообщение'}), 200
 
 
 # Маршрут для получения всех событий

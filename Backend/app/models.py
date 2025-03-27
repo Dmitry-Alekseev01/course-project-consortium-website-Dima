@@ -1,3 +1,4 @@
+from sqlalchemy import UniqueConstraint
 from . import utils
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, time, date
@@ -86,6 +87,11 @@ class Contact(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     company = db.Column(db.String(100))
     message = db.Column(db.Text, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('email', 'message', name='uq_email_message'),
+    )
+
     def __str__(self):
         return (f"{self.id} {self.name}")
 
