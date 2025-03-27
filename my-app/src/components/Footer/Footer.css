@@ -46,7 +46,6 @@ footer {
     font-size: 0.8rem;
 }
 
-/* Адаптивность */
 @media (max-width: 992px) {
     .footer-container {
         flex-direction: column;
@@ -58,13 +57,50 @@ footer {
     }
 }
 
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
     .footer-container {
-        padding: 0 0.5rem;
+        max-width: 550px;
+        height: 650px;
     }
 
     .footer-socials a {
         margin: 0 0.25rem;
         font-size: 1rem;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 0.2rem;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+} */
+
+@media (max-width: 600px) {
+    .footer-container {
+        padding: 20px 10px;
+    }
+    
+    .footer-section {
+        margin-bottom: 12px;
+    }
+    
+    .footer-section h3 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    
+    .footer-section ul li {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    
+    .footer-socials a {
+        font-size: 1rem;
+        margin: 0 6px;
+    }
+    
+    .copyright {
+        margin-top: 15px;
     }
 }

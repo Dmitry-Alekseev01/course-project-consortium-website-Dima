@@ -52,7 +52,7 @@ const SearchResults = () => {
       setError(null);
     } catch (err) {
       console.error("Ошибка при поиске:", err);
-      setError("Ошибка загрузки результатов поиска");
+      setError("Loading error");
     }
   };
 
