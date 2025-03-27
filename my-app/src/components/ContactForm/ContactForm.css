@@ -89,20 +89,21 @@
   
   .success-message {
     color: white;
+    width: 300px;
     margin-top: 1rem;
     padding: 0.75rem;
     background-color: green;
     border-radius: 6px;
     text-align: center;
-    border: 1px solid rgba(40, 167, 69, 0.2);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
   
   .error-message {
-    color: white;
+    color: black;
+    width: 300px;
     margin-top: 1rem;
     padding: 0.75rem;
-    background-color: red;
+    background-color: white;
     border-radius: 6px;
     text-align: center;
     border: 1px solid rgba(220, 53, 69, 0.2);
@@ -110,7 +111,7 @@
   }
   
   .success {
-    color: white;
+    color: green;
     margin-top: 1rem;
   }
   
@@ -125,7 +126,6 @@
   }
   
   .col-lg-6 p {
-    /* color: #173C1A; */
     margin-bottom: 0.5rem;
   }
   

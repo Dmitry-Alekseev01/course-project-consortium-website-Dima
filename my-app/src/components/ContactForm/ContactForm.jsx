@@ -187,7 +187,7 @@ const ContactForm = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-6 form-wrapper">
-            <h2>{language === 'ru' ? 'Свяжитесь с нами' : 'Contact Us'}</h2>
+            <h2>{language === 'ru' ? 'Свяжитесь с нами' : 'Contact us'}</h2>
             <p>{language === 'ru' 
               ? 'Мы всегда рады вашим вопросам и предложениям. Напишите нам, и мы ответим в кратчайшие сроки!' 
               : 'We always welcome your questions and suggestions. Write to us and we will respond as soon as possible!'}
@@ -278,7 +278,7 @@ const ContactForm = () => {
           </div>
 
           <div className="col-lg-6">
-            <h3>{language === 'ru' ? "Наши контакты" : "Our Contacts"}</h3>
+            <h3>{language === 'ru' ? "Наши контакты" : "Our contacts"}</h3>
             <p>Russian Federation</p>
             <p>info@example.com</p>
             <p>+7 123 456 7890</p>
