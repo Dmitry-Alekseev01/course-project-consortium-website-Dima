@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import ContactForm from "../../components/ContactForm/ContactForm";
 import Contacts from "../../components/Contacts/Contacts"
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
-import React, {useContext, useEffect, useState } from "react";
+import React, {useContext} from "react";
 
 const Home = () => {
   const { language } = useContext(LanguageContext);
@@ -13,7 +13,6 @@ const Home = () => {
     <div>
       <Navbar />
       <div className="page"> 
-      {/* <h1>Добро пожаловать на сайт</h1> */}
       <h1>{language === 'ru' ? 'Добро пожаловать на сайт' : 'Welcome to site'}</h1>
       </div>
       <MapSection/>

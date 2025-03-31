@@ -8,8 +8,6 @@ import MagazineFilter from "../../components/FilterButtonJournals/FilterButtonJo
 import { Link } from "react-router-dom";
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
-// import DateFilter from "../../components/FilterButtonDate/FilterButtonDate";
-
 const SearchResults = () => {
   const { language } = useContext(LanguageContext);
   const location = useLocation();
@@ -84,16 +82,6 @@ const SearchResults = () => {
     setFilters(prev => ({ ...prev, magazines }));
   };
 
-  const handleDateFilter = ({ dateFrom, dateTo }) => {
-    const params = new URLSearchParams(location.search);
-    params.set("dateFrom", dateFrom);
-    params.set("dateTo", dateTo);
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-    setFilters(prev => ({ ...prev, dateFrom, dateTo }));
-  };
-
-  
-
   return (
     <div>
       <Navbar />
@@ -102,7 +90,6 @@ const SearchResults = () => {
         <SortButton onSort={handleSort} />
         <AuthorFilter onApply={handleAuthorFilter} />
         <MagazineFilter onApply={handleMagazineFilter} />
-        {/* <DateFilter onApply={handleDateFilter} /> */}
       </div>
       {error && <p className="error-message">{error}</p>}
       {searchResults ? (

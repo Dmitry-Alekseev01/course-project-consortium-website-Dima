@@ -1,4 +1,3 @@
-// import React, { useEffect, useState } from "react";
 import React, { useContext, useEffect, useState } from "react";
 import "./Projects.css";
 import Navbar from "../../components/Navbar/Navbar";
@@ -18,7 +17,6 @@ const Projects = () => {
       .catch((error) => console.error('Ошибка при загрузке проектов:', error));
   }, []);
 
-  // Функция для определения типа файла
   const getFileType = (fileName) => {
     const extension = fileName.split(".").pop().toLowerCase();
     if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
@@ -40,7 +38,6 @@ const Projects = () => {
     }).join(', ');
   };
 
-  // Функция для отображения файла в зависимости от его типа
   const renderFile = (fileUrl) => {
     const fileType = getFileType(fileUrl);
 
@@ -76,19 +73,14 @@ const Projects = () => {
       <div className="projects-list">
         {projects.map((project) => (
           <div key={project.id} className="project">
-            {/* <h2>{project.title}</h2> */}
             <h2>{project[`title_${language}`] || project.title}</h2>
-            {/* <p><strong>Авторы:</strong> {project.authors.join(', ')}</p> */}
             <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(project.authors)}</p>
-            {/* <p><strong>Дата публикации:</strong> {project.publication_date}</p> */}
             <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
               {new Date(project.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
             </p>
-            {/* <p><strong>Описание:</strong> {project.description}</p> */}
             <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
               {project[`description_${language}`] || project.description}
             </p>
-            {/* <p><strong>Текст:</strong> {project.content}</p> */}
             <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
               {project[`content_${language}`] || project.content}
             </p>
