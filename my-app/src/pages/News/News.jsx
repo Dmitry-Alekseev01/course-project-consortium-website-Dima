@@ -72,15 +72,11 @@ const News = () => {
       <div className="projects-list">
         {news.map((news) => (
           <div key={news.id} className="project">
-            {/* <h2>{news.title}</h2> */}
             <h2>{news[`title_${language}`] || news.title}</h2>
-            {/* <p><strong>Авторы:</strong> {news.authors.join(', ')}</p>
-            <p><strong>Дата публикации:</strong> {news.publication_date}</p> */}
             <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(news.authors)}</p>
             <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 
               {new Date(news.publication_date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
             </p>
-            {/* <p><strong>Описание:</strong> {news.description}</p> */}
             <p><strong>{language === 'ru' ? 'Описание: ' : 'Abstract: '}</strong> 
               {news[`description_${language}`] || news.description}
             </p>
@@ -91,8 +87,6 @@ const News = () => {
               </p>
             )}
             </p>
-            {/* <p><strong>Журнал:</strong> {news.magazine.name || "Не издавалась"}</p> */}
-            {/* <p><strong>Текст:</strong> {news.content}</p> */}
             <p><strong>{language === 'ru' ? 'Текст: ' : 'Text: '}</strong> 
               {news[`content_${language}`] || news.content}
             </p>

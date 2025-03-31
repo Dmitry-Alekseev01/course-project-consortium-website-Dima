@@ -1,5 +1,4 @@
-// import React, { useState } from 'react';
-import React, {useContext, useEffect, useState } from "react";
+import React, {useContext, useState } from "react";
 import './SortButton.css'; 
 import { Link } from "react-router-dom";
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
@@ -21,12 +20,10 @@ const SortButton = ({ onSort }) => {
   return (
     <div className="dropdown">
       <button className="dropbtn" onClick={toggleDropdown}>
-        {/* Отсортировать */}
         {language === 'ru' ? 'Отсортировать' : 'Sort'}
       </button>
       {isOpen && (
         <div className="dropdown-content">
-          {/* {language === 'ru' ? 'Главная' : 'Home'} */}
           <Link to="#" onClick={() => handleSort('alphabetical')}>{language === 'ru' ? 'По алфавиту (А - Я)' : 'Alphabetical (A - Z)'}</Link>
           <Link to="#" onClick={() => handleSort('reverse_alphabetical')}>{language === 'ru' ? 'По алфавиту (Я - А)' : 'Alphabetical (Z - A)'}</Link>
           <Link to="#" onClick={() => handleSort('date_asc')}>{language === 'ru' ? 'По дате (стар - нов)' : 'Date (old - new)'}</Link>

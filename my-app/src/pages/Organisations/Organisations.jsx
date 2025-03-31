@@ -22,7 +22,6 @@ const Organisations = () => {
     <div className="aboutUs">
       <Navbar />
       <h1>{language === 'ru' ? 'Члены консорциума' : 'Consortium members'}</h1>
-      {/* <h1>Члены консорциума</h1> */}
       <div className="team">
         {organisations.map((organisation) => (
           <div key={organisation.id} className="teamMember">

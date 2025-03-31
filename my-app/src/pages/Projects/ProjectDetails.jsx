@@ -14,7 +14,6 @@ const ProjectDetails = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Запрашиваем данные о проекте с бэкенда по его ID
     fetch(`${process.env.REACT_APP_API_URL}/projects/${id}`)
       .then(response => {
         if (!response.ok) {
@@ -100,11 +99,7 @@ const ProjectDetails = () => {
     <section className="event-detail">
       <Navbar />
       <div className="container">
-        {/* <h2>{project.title}</h2>
-        <p><strong>Дата публикации:</strong> {project.publication_date}</p>
-        <p><strong>Описание:</strong> {project.description}</p>
-        <p><strong>Содержание:</strong> {project.content}</p>
-        {project.materials && (
+        {/*{project.materials && (
           <p>
             <strong>Материалы:</strong>{" "}
             <Link to={`/uploads/${project.materials}`} download>

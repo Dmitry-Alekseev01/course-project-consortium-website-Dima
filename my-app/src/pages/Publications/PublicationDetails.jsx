@@ -56,11 +56,6 @@ const PublicationDetails = () => {
     <section className="event-detail">
       <Navbar />
       <div className="container">
-        {/* <h2>{publication.title}</h2>
-        <p><strong>Авторы:</strong> {publication.authors.join(', ')}</p>
-        <p><strong>Дата публикации:</strong> {publication.publication_date}</p>
-        <p><strong>Журнал:</strong> {publication.magazine.name || "Не указан"}</p>
-        <p><strong>Описание:</strong> {publication.annotation}</p> */}
         <h2>{publication[`title_${language}`] || publication.title}</h2>
         <p><strong>{language === 'ru' ? 'Авторы: ' : 'Authors: '}</strong> {formatAuthors(publication.authors)}</p>
         <p><strong>{language === 'ru' ? 'Дата публикации: ' : 'Publication Date: '}</strong> 

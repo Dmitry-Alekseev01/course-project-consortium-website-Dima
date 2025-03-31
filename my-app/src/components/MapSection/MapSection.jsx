@@ -48,8 +48,7 @@ const MapSection = () => {
             <div className="content-wrapper" style={{ height: '100%', width: '100%' }}>
               <iframe
                 title="Google Map"
-                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCt1265A4qvZy9HKUeA8J15AOC4SrCyZe4&q=Russian%20Federation"
-                style={{ width: '100%', height: '100%', border: 0 }}
+                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCt1265A4qvZy9HKUeA8J15AOC4SrCyZe4&q=Покровский%20бульвар%2011С10,Москва&zoom=17&language=ru"                style={{ width: '100%', height: '100%', border: 0 }}
                 allowFullScreen
               />
             </div>
