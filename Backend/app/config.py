@@ -68,12 +68,12 @@ class Config:
     CACHE_TYPE = 'SimpleCache'
     CACHE_DEFAULT_TIMEOUT = 3600
 
-    # CORS_ORIGINS = os.environ.get('CORS_ORIGINS').split(',')
-    # CORS_METHODS = os.environ.get('CORS_METHODS').split(',')
-    # CORS_ALLOW_HEADERS = os.environ.get('CORS_ALLOW_HEADERS').split(',') 
-    # CORS_EXPOSE_HEADERS = os.environ.get('CORS_EXPOSE_HEADERS').split(',')
-    # CORS_SUPPORTS_CREDENTIALS = os.environ.get('CORS_SUPPORTS_CREDENTIALS').lower() == 'true'
-    # CORS_MAX_AGE = int(os.environ.get('CORS_MAX_AGE'))
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '').split(',')
+    CORS_METHODS = os.environ.get('CORS_METHODS', 'GET,POST,PUT,DELETE,OPTIONS').split(',')
+    CORS_ALLOW_HEADERS = os.environ.get('CORS_ALLOW_HEADERS', 'Content-Type,Authorization').split(',')
+    CORS_EXPOSE_HEADERS = os.environ.get('CORS_EXPOSE_HEADERS', 'Content-Type').split(',')
+    CORS_SUPPORTS_CREDENTIALS = os.environ.get('CORS_SUPPORTS_CREDENTIALS', 'False').lower() == 'true'
+    CORS_MAX_AGE = int(os.environ.get('CORS_MAX_AGE', '600'))
 
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI= 'sqlite:///:memory:'
