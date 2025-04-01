@@ -120,9 +120,10 @@ const ProjectDetails = () => {
       </p>
       <p>
         <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
-        <Link to={`/uploads/${project.materials}`} download>
+        {/* <Link to={`/uploads/${project.materials}`} download>
         {language === 'ru' ? 'Скачать' : 'Dowload'}
-        </Link>
+        </Link> */}
+          {project.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${project.materials}`) : "Файл отсутствует"}
       </p>
       {/* <Link to={`/projects/${project.id}`} state={project} className="project-link">
         Подробнее
