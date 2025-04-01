@@ -108,11 +108,13 @@ class Event(TranslateMixin, db.Model):
     #date = db.Column(db.Date, nullable=False)
     #time = db.Column(db.Time, nullable=False)
     location = db.Column(db.String(100), nullable=False)
+    location_en = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text, nullable=False)
     description_en = db.Column(db.Text, nullable=True)
     __translations__ = (
         ('title', 'title_en'),
-        ('description', 'description_en')
+        ('description', 'description_en'),
+        ('location', 'location_en')
     )
     def __str__(self):
         return (f"{self.id} {self.title}")
@@ -189,4 +191,4 @@ class Project(TranslateMixin, db.Model):
 class Organisation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image = db.Column(db.String(200), nullable=False)
-    link = db.Column(db.String(200), nullable=False)
+    link = db.Column(db.String(200), nullable=False, unique=True)
