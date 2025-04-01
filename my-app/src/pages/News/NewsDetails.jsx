@@ -127,13 +127,7 @@ const NewsDetails = () => {
       </p>
       <p>
         <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
-        {/* <Link to={`/api/uploads/${news.materials}`} download>
-        {language === 'ru' ? 'Скачать' : 'Download'}
-        </Link> */}
-              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}${encodeURIComponent(news.materials)}`) : language === 'ru' ? 'Файл отсутствует' : 'No file'}
-              {/* {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${news.materials}`) : language === 'ru' ? 'Файл отсутствует' : 'No dile'} */}
-              {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
-        {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
+        {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}${encodeURIComponent(news.materials)}`) : language === 'ru' ? 'Файл отсутствует' : 'No file'}
       </p>
       {/* <Link to={`/news/${news.id}`} state={news} className="news-link">
         {language === 'ru' ? 'Узнать больше' : 'Read more'}            
