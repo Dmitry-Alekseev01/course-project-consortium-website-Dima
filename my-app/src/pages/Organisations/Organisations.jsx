@@ -44,7 +44,7 @@ const Organisations = () => {
       <div className="team">
         {organisations.map((organisation) => (
           <div key={organisation.id} className="teamMember">
-            <Link to={organisation.link}> {renderFile(`${process.env.REACT_APP_API_URL}${encodeURIComponent(organisation.image)}`)} {/* <img src={organisation.image}/>*/}</Link> 
+            <Link to={organisation.link}> {renderFile(`${process.env.REACT_APP_API_URL}/${encodeURIComponent(organisation.image)}`)} {/* <img src={organisation.image}/>*/}</Link> 
           </div>
         ))}
       </div>
