@@ -92,7 +92,7 @@ const News = () => {
             </p>
             <p>
               <strong>{language === 'ru' ? 'Материалы: ' : 'Materials: '}</strong>{" "}
-              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}${encodeURIComponent(news.materials)}`) : language === 'ru' ? 'Файл отсутствует' : 'No dile'}
+              {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}${encodeURIComponent(news.materials)}`) : language === 'ru' ? 'Файл отсутствует' : 'No file'}
               {/* {news.materials ? renderFile(`${process.env.REACT_APP_API_URL}/${news.materials}`) : language === 'ru' ? 'Файл отсутствует' : 'No dile'} */}
               {/* fetch(`${process.env.REACT_APP_API_URL}/publications/${id}`) */}
             </p>
