@@ -1,6 +1,5 @@
 import React, {useContext, useState } from "react";
 import './SortButton.css'; 
-import { Link } from "react-router-dom";
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 
 
@@ -24,10 +23,10 @@ const SortButton = ({ onSort }) => {
       </button>
       {isOpen && (
         <div className="dropdown-content">
-          <Link to="#" onClick={() => handleSort('alphabetical')}>{language === 'ru' ? 'По алфавиту (А - Я)' : 'Alphabetical (A - Z)'}</Link>
-          <Link to="#" onClick={() => handleSort('reverse_alphabetical')}>{language === 'ru' ? 'По алфавиту (Я - А)' : 'Alphabetical (Z - A)'}</Link>
-          <Link to="#" onClick={() => handleSort('date_asc')}>{language === 'ru' ? 'По дате (стар - нов)' : 'Date (old - new)'}</Link>
-          <Link to="#" onClick={() => handleSort('date_desc')}>{language === 'ru' ? 'По дате (нов - стар)' : 'Date (new - old)'}</Link>
+          <button onClick={() => handleSort('alphabetical')}>{language === 'ru' ? 'По алфавиту (А - Я)' : 'Alphabetical (A - Z)'}</button>
+          <button onClick={() => handleSort('reverse_alphabetical')}>{language === 'ru' ? 'По алфавиту (Я - А)' : 'Alphabetical (Z - A)'}</button>
+          <button onClick={() => handleSort('date_asc')}>{language === 'ru' ? 'По дате (стар - нов)' : 'Date (old - new)'}</button>
+          <button onClick={() => handleSort('date_desc')}>{language === 'ru' ? 'По дате (нов - стар)' : 'Date (new - old)'}</button>
         </div>
       )}
     </div>
