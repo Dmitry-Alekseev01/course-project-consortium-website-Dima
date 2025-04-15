@@ -68,7 +68,8 @@ class Config:
     CACHE_TYPE = 'SimpleCache'
     CACHE_DEFAULT_TIMEOUT = 3600
 
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', "http://kapitanlevan.com:3000")
+   # CORS_ORIGINS = os.environ.get('CORS_ORIGINS', "http://kapitanlevan.com:3000")
+    CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
     CORS_METHODS = os.environ.get('CORS_METHODS', 'GET,POST,PUT,DELETE,OPTIONS').split(',')
     CORS_ALLOW_HEADERS = os.environ.get('CORS_ALLOW_HEADERS', 'Content-Type,Authorization').split(',')
     CORS_EXPOSE_HEADERS = os.environ.get('CORS_EXPOSE_HEADERS', 'Content-Type').split(',')
@@ -80,6 +81,6 @@ class TestConfig(Config):
     BASIC_AUTH_USERNAME = 'admin'
     BASIC_AUTH_PASSWORD = 'password'
     TESTING = True
-    # CORS_ORIGINS = ['http://localhost:3000']
-    # CORS_METHODS = ['GET', 'POST']
-    # CORS_SUPPORTS_CREDENTIALS = False
+    CORS_ORIGINS = ['http://localhost:3000']
+    CORS_METHODS = ['GET', 'POST']
+    CORS_SUPPORTS_CREDENTIALS = False

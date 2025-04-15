@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import LanguageButton from "../../components/ChangeLanguageButton/ChangeLanguageButton";
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
@@ -12,6 +12,7 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (e) => {

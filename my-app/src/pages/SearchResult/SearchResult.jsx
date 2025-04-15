@@ -62,6 +62,9 @@ const SearchResults = () => {
 
   const handleSort = (sortType) => {
     const params = new URLSearchParams(location.search);
+    if (!params.get("query")) {
+      params.set("query", query);
+    }
     params.set("sort", sortType);
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
