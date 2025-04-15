@@ -384,21 +384,37 @@ def search():
     organisations_results = db.session.scalars(sa_select(Organisation).filter(*base_filters["organisations"])).all()
 
     # Сбор авторов и журналов из найденных записей
-    authors_results = set()
-    magazines_results = set()
+    # authors_results = set()
+    # magazines_results = set()
+
+    # for news in news_results:
+    #     authors_results.update(news.authors)
+    #     if news.magazine:
+    #         magazines_results.add(news.magazine)
+
+    # for publication in publications_results:
+    #     authors_results.update(publication.authors)
+    #     if publication.magazine:
+    #         magazines_results.add(publication.magazine)
+
+    # for project in projects_results:
+    #     authors_results.update(project.authors)
+
+    authors_results = []
+    magazines_results = []
 
     for news in news_results:
-        authors_results.update(news.authors)
+        authors_results.extend(news.authors)
         if news.magazine:
-            magazines_results.add(news.magazine)
+            magazines_results.append(news.magazine)
 
     for publication in publications_results:
-        authors_results.update(publication.authors)
+        authors_results.extend(publication.authors)
         if publication.magazine:
-            magazines_results.add(publication.magazine)
+            magazines_results.append(publication.magazine)
 
     for project in projects_results:
-        authors_results.update(project.authors)
+        authors_results.extend(project.authors)
 
     results = {
         "news": [{"id": n.id, "title": n.title, "title_en": n.title_en, "link": f"/news/{n.id}"} for n in news_results],
