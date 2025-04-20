@@ -5,6 +5,8 @@ services:
     image: postgres:17
     env_file: 
       - ./Backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-network
     expose:
