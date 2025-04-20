@@ -5,10 +5,6 @@ services:
     image: postgres:17
     env_file: 
       - ./Backend/.env
-    
-
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-network
     expose:
@@ -30,15 +26,12 @@ services:
     depends_on: 
       - db
     restart: always
-        #condition: service_healthy
     networks:
       - backend-network
 
 
   frontend:
     image: leonidlivshitz/course-project-consortium-frontend
-    # env_file: 
-    #   - './my-app/.env'
     restart: always
     depends_on:
       - web
