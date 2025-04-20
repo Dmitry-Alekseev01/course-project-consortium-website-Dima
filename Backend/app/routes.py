@@ -354,7 +354,6 @@ def build_filters(query, authors, magazines, date_from, date_to):
 def search():
     query = request.args.get('q', '').strip()
     sort_type_str = request.args.get('sort', '').strip()
-    # Отфильтровываем пустые значения и преобразуем в int, если требуется
     authors = [int(a) for a in request.args.getlist('authors[]') if a.strip().isdigit()]
     magazines = [int(m) for m in request.args.getlist('magazines[]') if m.strip().isdigit()]
     date_from = request.args.get('date_from', type=lambda x: datetime.strptime(x, '%Y-%m-%d') if x else None)
