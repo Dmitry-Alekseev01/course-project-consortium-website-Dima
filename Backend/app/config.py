@@ -59,6 +59,8 @@ class Config:
     SECRET_KEY = os.environ.get(
         'SECRET_KEY',
     )
+    MAIL_DEFAULT_SENDER = ('No Reply', 'noreply@example.com')
+
 
     BASIC_AUTH_USERNAME=os.environ.get('BASIC_AUTH_USERNAME')
     BASIC_AUTH_PASSWORD=os.environ.get('BASIC_AUTH_PASSWORD')
