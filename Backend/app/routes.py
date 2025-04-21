@@ -39,7 +39,7 @@ def send_email(subject, sender, recipients, body):
 
 @main.route('/api/contact', methods=['POST'])
 def create_contact():
-    print("create_contact --------------------------------------")
+    #print("create_contact --------------------------------------")
     data = request.get_json()
 
     # Проверка обязательных полей
@@ -89,7 +89,7 @@ Email: {normalized_email}
 Компания: {data.get('company', 'не указано')}
 Сообщение: {data['message']}"""
         
-        if send_email(subject, normalized_email, ['maxweinsberg25@gmail.com'], body):
+        if send_email(subject, normalized_email, ['admin@dobhdvfc.mailosaur.net'], body):
             return jsonify({'message': 'Сообщение отправлено успешно!'}), 201
         else:
             raise Exception('Email sending failed')
