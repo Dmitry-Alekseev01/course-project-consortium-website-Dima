@@ -59,7 +59,7 @@ const News = () => {
       default:
         return (
           <Link to={fileUrl} download>
-            Скачать файл
+            {language === 'ru' ? 'Скачать файл' : 'Download file'}
           </Link>
         );
     }
